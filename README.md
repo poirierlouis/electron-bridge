@@ -51,7 +51,7 @@ In your electron entry-point:
 2. Add bridges you which to use on the renderer process side.
 3. Register all modules to actually listen to IPC handlers.
 
-`electron.dev.ts:`
+> electron.dev.ts
 ```typescript
 import {app, BrowserWindow} from 'electron';
 import {BridgeService, DialogBridge} from 'electron-bridge/main';
@@ -100,7 +100,7 @@ Now that we have registered IPC handlers, we must declare a preload script.
 Using `context bridge`, it will allows us to expose bridges on the renderer process.
 With `PreloadService`, we can expose only what we want to use:
 
-`electron.preload.ts:`
+> electron.preload.ts
 ```typescript
 import {PreloadService} from 'electron-bridge/preload';
 
@@ -121,7 +121,7 @@ You must call `expose()` in order to expose your modules using `context bridge`.
 Now Electron needs to know that this script must be preloaded. When creating a BrowserWindow, we just need to set the 
 preload path of our script like below:
 
-`electron.dev.ts`:
+> electron.dev.ts
 ```typescript
 import * as path from 'path';
 
@@ -138,7 +138,7 @@ win = new BrowserWindow({
 ### 3. Renderer process side
 In your renderer process, aka your application. You can now access exposed bridges like this:
 
-`index.html:`
+> index.html
 ```html
 <!DOCTYPE html>
 <html>
@@ -177,7 +177,7 @@ $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 
 You must implement Bridge interface in order to register a bridge in the main process:
 
-`src/bridge/main/app.bridge.ts:`
+> src/bridge/main/app.bridge.ts
 ```typescript
 import {App, ipcMain} from 'electron';
 import {Bridge} from 'electron-bridge/main';
@@ -198,6 +198,7 @@ export class AppBridge implements Bridge {
         ipcMain.handle('eb.app.getPath', (event: any, path: string) => {
             return this.app.getPath(path);
         });
+        // allocate resources you'll need.
     }
 
     public release(): void {
@@ -215,7 +216,7 @@ export class AppBridge implements Bridge {
 
 Then, you must write your module using BridgeModule interface:
 
-`src/bridge/preload/app.module.ts:`
+> src/bridge/preload/app.module.ts
 ```typescript
 import {ipcRenderer} from 'electron';
 import {BridgeModule} from 'electron-bridge/preload';
@@ -239,7 +240,7 @@ export const AppModule: BridgeModule = {
 
 You can now import and add your custom module in the preload script:
 
-`src/electron.preload.ts:`
+> src/electron.preload.ts
 ```typescript
 import {PreloadService} from 'electron-bridge/preload';
 import {AppModule} from './bridge/module/app.module.ts';
@@ -256,7 +257,7 @@ preloadService.add('dialog')
 
 Lets write an exported interface for our `app` bridge:
 
-`src/bridge/api/app.api.ts:`
+> src/bridge/api/app.api.ts
 ```typescript
 export interface AppApi {
     
@@ -269,7 +270,7 @@ export interface AppApi {
 
 And augment the Window interface:
 
-`renderer.d.ts:`
+> renderer.d.ts
 ```typescript
 declare global {
     interface Window {
@@ -280,18 +281,18 @@ declare global {
 
 ### 4. Build it
 Use your preferred package to bundle your application and target each Electron's process. You can find an example using
-[webpack](https://webpack.js.org/) in this configuration file: `./webpack.prod.js`.
+[webpack](https://webpack.js.org/) with this repository configuration file: `./webpack.dev.js`.
 
 And then bundle with:
 ```shell script
-$ webpack --config webpack.prod.js
+$ webpack --config webpack.dev.js
 ```
 
 ### 5. Test it
 `Side: renderer process`
 
 We can now use our custom module:
-`index.html:`
+> index.html
 ```html
 <!-- ... -->
 <script>
@@ -328,7 +329,7 @@ You can then use `electron-bridge-cli` in `cli/` to generate a bridge file, a mo
 
 Actually, this package describe `schemas/` and use `electron-bridge-cli` to generate all files under `src/`.
 
-`This is the way.`
+> This is the way.
 
 ## Contributing
 
