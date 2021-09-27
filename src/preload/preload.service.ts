@@ -6,6 +6,8 @@ import {NativeThemeModule} from "./native-theme.module";
 import {StoreModule} from "./store.module";
 import {PathModule} from "./path.module";
 import {PowerMonitorModule} from "./power-monitor.module";
+import {AutoUpdaterModule} from "./auto-updater.module";
+import {FileSystemModule} from "./file-system.module";
 
 /**
  * Service to add common and custom modules to preload.
@@ -13,10 +15,12 @@ import {PowerMonitorModule} from "./power-monitor.module";
 export class PreloadService {
 
     private static readonly commons: BridgeModule[] = [
+        AutoUpdaterModule,
         DialogModule,
+        FileSystemModule,
         NativeThemeModule,
-        PowerMonitorModule,
         PathModule,
+        PowerMonitorModule,
         StoreModule
     ];
     private readonly modules: BridgeModule[];

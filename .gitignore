@@ -3,3 +3,6 @@ demo/node_modules/
 node_modules/
 *.tgz
 dist/
+src/index.js
+demo/src/electron.dev.js
+demo/src/electron.preload.js

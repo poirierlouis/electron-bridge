@@ -1,1 +1,1 @@
-export * from './typings';
+export * from './renderer';

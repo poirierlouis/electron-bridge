@@ -1,42 +1,44 @@
-import {BrowserWindow, ipcMain, powerMonitor} from 'electron';
-import {Bridge} from "./bridge";
+import { BrowserWindow, ipcMain, IpcMainInvokeEvent, powerMonitor } from "electron";
+import { Bridge } from "./bridge";
 
 export class PowerMonitorBridge implements Bridge {
-
-    private readonly events: string[];
+    private static events: string[] = [
+                'suspend',
+                'resume',
+                'on-ac',
+                'on-battery',
+                'lock-screen',
+                'unlock-screen',
+                'user-did-become-active',
+                'user-did-resign-active'
+            ];
 
     constructor(private win: BrowserWindow) {
-        this.events = [
-            'suspend',
-            'resume',
-            'on-ac',
-            'on-battery',
-            'shutdown',
-            'lock-screen',
-            'unlock-screen',
-            'user-did-become-active',
-            'user-did-resign-active'
-        ];
     }
 
     public register(): void {
-        this.events.forEach(event => powerMonitor.on(<any>event, () => this.win.webContents.send(event)));
-        ipcMain.handle('eb.powerMonitor.getSystemIdleState', (event, idleThreshold) => {
+        PowerMonitorBridge.events.forEach(event => {
+            powerMonitor.on(<any>event, () => this.win.webContents.send(`eb.powerMonitor.${event}`));
+        });
+        powerMonitor.on('shutdown', (event: Event) => this.win.webContents.send('eb.powerMonitor.shutdown', event));
+        ipcMain.handle('eb.powerMonitor.getSystemIdleState', async (_: IpcMainInvokeEvent, idleThreshold: number) => {
             return powerMonitor.getSystemIdleState(idleThreshold);
         });
-        ipcMain.handle('eb.powerMonitor.getSystemIdleTime', () => {
+        ipcMain.handle('eb.powerMonitor.getSystemIdleTime', async () => {
             return powerMonitor.getSystemIdleTime();
         });
-        ipcMain.handle('eb.powerMonitor.isOnBatteryPower', () => {
+        ipcMain.handle('eb.powerMonitor.isOnBatteryPower', async () => {
             return powerMonitor.isOnBatteryPower();
         });
     }
 
     public release(): void {
-        this.events.forEach(event => powerMonitor.off(<any>event, () => this.win.webContents.send(event)));
+        PowerMonitorBridge.events.forEach(event => {
+            powerMonitor.off(<any>event, () => this.win.webContents.send(`eb.powerMonitor.${event}`));
+        });
+        powerMonitor.off('shutdown', (event: Event) => this.win.webContents.send('eb.powerMonitor.shutdown', event));
         ipcMain.removeHandler('eb.powerMonitor.getSystemIdleState');
         ipcMain.removeHandler('eb.powerMonitor.getSystemIdleTime');
         ipcMain.removeHandler('eb.powerMonitor.isOnBatteryPower');
     }
-
 }

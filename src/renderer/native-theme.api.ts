@@ -1,5 +1,6 @@
+
 /**
- *
+ * Emitted when something in the underlying NativeTheme has changed.
  */
 export interface ThemeUpdatedEvent {
     shouldUseDarkColors: boolean;
@@ -11,8 +12,9 @@ export interface ThemeUpdatedEvent {
  * Read and respond to changes in Chromium's native color theme.
  */
 export interface NativeThemeApi {
-
-    updated(callback: (event: ThemeUpdatedEvent) => void): void;
+    shouldUseDarkColors(): Promise<boolean>;
+    shouldUseHighContrastColors(): Promise<boolean>;
+    shouldUseInvertedColorScheme(): Promise<boolean>;
     themeSource(value: 'system' | 'light' | 'dark'): Promise<void>;
-
+    onUpdated(listener: (event: ThemeUpdatedEvent) => void): void;
 }

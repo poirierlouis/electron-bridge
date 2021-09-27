@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>electron-bridge</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            color: #000000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #ffffff;
+            }
+
+            .tabs button {
+                color: #ffffff;
+            }
+        }
+
+        section {
+            display: flex;
+            flex-flow: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 80%;
+            height: inherit;
+            margin: 16px auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tabs button {
+            height: inherit;
+            padding: 16px;
+            margin: 16px;
+
+            font-weight: 500;
+            font-size: 1.5rem;
+            border: 4px solid #460a6b;
+            border-radius: 16px;
+            background-color: #460a6b7f;
+        }
+
+        .tabs button:hover,
+        .tabs button:active {
+            cursor: pointer;
+            border-color: #7a11bb;
+            background-color: #7a11bb7f;
+        }
+
+        .tab {
+            display: flex;
+            flex-flow: column;
+            width: inherit;
+            height: inherit;
+            padding: 16px;
+            margin: 16px;
+
+            font-size: 1.25rem;
+            border: 4px solid #460a6b;
+            border-radius: 16px;
+            background-color: #460a6b7f;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .form-field {
+            display: flex;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<section>
+    <h1>My Awesome Electron App</h1>
+
+    <div class="tabs">
+        <button data-tab="dialog">Dialog</button>
+        <button data-tab="native-theme">Native Theme</button>
+        <button data-tab="power-monitor">Power Monitor</button>
+        <button data-tab="store">Store</button>
+    </div>
+
+    <div id="dialog" class="tab">
+        <p class="form-field">
+            <button id="open-dialog">Open dialog</button>
+            <input id="path" type="text">
+        </p>
+
+        <p class="form-field">
+            <label for="error">Error:</label>
+            <textarea id="error"></textarea>
+        </p>
+    </div>
+
+    <div id="native-theme" class="tab">
+        <p class="form-field">
+            <label for="theme-source">Set theme source</label>
+            <select id="theme-source" onchange="onThemeSourceChanged()">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </p>
+
+        <p class="form-field">
+            <label for="shouldUseDarkColors">Should use dark colors?</label>
+            <input id="shouldUseDarkColors" type="checkbox" readonly>
+        </p>
+
+        <p class="form-field">
+            <label for="shouldUseHighContrastColors">Should use high contrast colors?</label>
+            <input id="shouldUseHighContrastColors" type="checkbox" readonly>
+        </p>
+
+        <p class="form-field">
+            <label for="shouldUseInvertedColorScheme">Should use inverted color scheme?</label>
+            <input id="shouldUseInvertedColorScheme" type="checkbox" readonly>
+        </p>
+    </div>
+
+    <div id="power-monitor" class="tab">
+        <h3>Is on battery power? <span id="isOnBatteryPower">Unknown</span></h3>
+
+        <label for="events">Events</label>
+        <textarea id="events"></textarea>
+    </div>
+
+    <div id="store" class="tab">
+        <h3>Current store path: <span id="storePath">'store'</span></h3>
+
+        <p>
+            <label for="store-path">Enter a store path:</label>
+            <input id="store-path" type="text" value="store">
+            <button onclick="onStoreChanged()">Change store</button>
+        </p>
+
+        <div>
+
+        </div>
+    </div>
+</section>
+<script>
+    let currentTab = 'power-monitor';
+    let currentStore = 'store';
+
+    function load() {
+        // Tabs header logic
+        loadTabsHeader();
+
+        // Load tabs
+        loadDialog();
+        loadNativeTheme();
+        loadPowerMonitor();
+        loadStore();
+    }
+
+    // #region Dialog
+
+    function loadDialog() {
+        const $openDialog = document.querySelector('#open-dialog');
+        const $path = document.querySelector('#path');
+        const $error = document.querySelector('#error');
+
+        $openDialog.addEventListener('click', () => {
+            dialog.showOpenDialog({
+                title: 'My Awesome Dialog',
+                properties: ['openFile'],
+                filters: [
+                    {name: 'Awesome File', extensions: ['txt', 'json']}
+                ]
+            }).then(result => {
+                if (result.canceled || result.filePaths.length !== 1) {
+                    console.warn(`<i-need-an-awesome-file />`);
+                    return;
+                }
+                $path.value = result.filePaths[0];
+            }).catch(error => {
+
+            });
+        });
+    }
+
+    // #endregion
+
+
+
+    // #region Native Theme
+
+    function loadNativeTheme() {
+        const $shouldUseDarkColors = document.querySelector('#shouldUseDarkColors');
+        const $shouldUseHighContrastColors = document.querySelector('#shouldUseHighContrastColors');
+        const $shouldUseInvertedColorScheme = document.querySelector('#shouldUseInvertedColorScheme');
+
+        nativeTheme.onUpdated(event => {
+            $shouldUseDarkColors.checked = event.shouldUseDarkColors;
+            $shouldUseHighContrastColors.checked = event.shouldUseHighContrastColors;
+            $shouldUseInvertedColorScheme.checked = event.shouldUseInvertedColorScheme;
+        });
+    }
+
+    function onThemeSourceChanged() {
+        const $themeSource = document.querySelector('#theme-source');
+
+        nativeTheme.themeSource($themeSource.value);
+    }
+
+    // #endregion
+
+
+
+    // #region PowerMonitor
+
+    function loadPowerMonitor() {
+        powerMonitor.isOnBatteryPower().then(updateIsOnBatteryPower);
+        powerMonitor.onBattery(() => updateIsOnBatteryPower(true));
+        powerMonitor.onAc(() => updateIsOnBatteryPower(false));
+        powerMonitor.onLockScreen(() => appendEvent('receive: lock-screen'));
+        powerMonitor.onUnlockScreen(() => appendEvent('receive: unlock-screen'));
+        powerMonitor.onSuspend(() => appendEvent('receive: suspend'));
+        powerMonitor.onResume(() => appendEvent('receive: resume'));
+    }
+
+    function appendEvent(message) {
+        const $events = document.querySelector('#power-monitor #events');
+
+        $events.value = `${message}\r\n${$events.value}`;
+    }
+
+    function updateIsOnBatteryPower(isOnBatteryPower) {
+        const $isOnBatteryPower = document.querySelector('#power-monitor #isOnBatteryPower');
+
+        $isOnBatteryPower.innerHTML = (isOnBatteryPower) ? 'yes' : 'no';
+        appendEvent((isOnBatteryPower) ? 'receive: battery' : 'receive: ac');
+    }
+
+    // #endregion
+
+
+
+    // #region PowerMonitor
+
+    function loadStore() {
+        store.withStore(currentStore);
+    }
+
+    function onStoreChanged() {
+        const $storePath = document.querySelector('#store #storePath');
+        const $storePathInput = document.querySelector('#store #store-path');
+
+        $storePath.innerText = `'${currentStore}'`;
+        store.withStore($storePathInput.value).then(() => {
+            currentStore = $storePathInput.value;
+        }).catch((error) => {
+            alert(error)
+        });
+    }
+
+    // #endregion
+
+
+
+    // #region Tab logic
+
+    function loadTabsHeader() {
+        const $tabButtons = document.querySelectorAll('.tabs button');
+        const $tabs = document.querySelectorAll(`.tab:not(#${currentTab})`);
+
+        $tabButtons.forEach($button => {
+            const tabId = $button.getAttribute('data-tab');
+
+            $button.addEventListener('click', () => {
+                openTab(tabId);
+            });
+        });
+        $tabs.forEach($tab => {
+            $tab.classList.add('hide');
+        });
+    }
+
+    function openTab(tabId) {
+        const $nextTab = document.querySelector(`#${tabId}.tab`);
+        const $currentTab = document.querySelector(`#${currentTab}.tab`);
+
+        if (!$nextTab) {
+            return;
+        }
+        $currentTab.classList.add('hide');
+        $nextTab.classList.remove('hide');
+        currentTab = tabId;
+    }
+
+    // #endregion
+
+
+
+    // #region Start
+
+    load();
+
+    // #endregion
+</script>
+</body>
+</html>

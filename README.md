@@ -1,102 +1,125 @@
 # electron-bridge
 
-electron-bridge provides access to main process modules through renderer process.
-Modules are available with safe [context isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation/) 
-using [Inter-Process Communication]() and [Context Bridge](https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations)
- within a [sandbox](https://www.electronjs.org/docs/latest/tutorial/sandbox) environment.
+This library provides common main process modules (bridges) to be used from a renderer process in your Electron 
+application [(cf Process Model)](https://www.electronjs.org/docs/latest/tutorial/process-model).
 
+This package follows Electron' recommendations to provides you a reusable structured pattern while working in the safest
+ environment possible.
 
-You can use exposed features as-this like described below.
+Therefore, `electron-bridge` use [Inter-Process Communication](https://www.electronjs.org/docs/latest/api/ipc-main/) through 
+[context isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation/) and 
+[context bridge](https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations) 
+compatible with a [sandbox](https://www.electronjs.org/docs/latest/tutorial/sandbox) environment.
 
-Or you can use one of the following libraries to easily access exposed features with your framework of choice:
+## Repository
+This is a monorepo containing two packages:
+```
+electron-bridge     /you are here\
+  |
+  |-- demo/         a demo to quickly try common modules.
+  |-- cli/          electron-bridge-cli package to generate schemas.
+  |-- schemas/      schemas of the Electron's main process modules to generate and expose.
+  |-- src/          well...
 
-| Framework | Library          |
-|-----------|------------------|
-|   Angular | @lp/ngx-electron |
-|     React |                  |
-|       Vue |                  |
+```
 
 ## Install
 ```shell script
-$ npm install --save-dev @lp/electron-bridge
+$ npm install --save-dev electron-bridge
 ```
+
+## Naming convention
+Here is a brief description of the names used, so that we are in the page.
+
+- a `MySomethingBridge` is a class used in the main process.
+- a `MySomethingModule` is an object used in the preload script.
+- a `MySomethingApi` is a declaration used in a renderer process.
+
+With this example you must expect:
+- files to be named `my-something.<bridge|module|api>.ts`.
+- IPC channel to be named `eb.mySomething.<functionName>`. 
+
+Finally `common bridges` means exposed Electron's main features (e.g. nativeTheme, powerMonitor, etc.). It also contains 
+homemade bridges for the benefit of all developers.
 
 ## How to use
 
 ### 1. Main process side
 In your electron entry-point:
 
-1. Instanciate a ProxyService.
-2. Add modules you which to use on the renderer process side.
+1. Instantiate a BridgeService.
+2. Add bridges you which to use on the renderer process side.
 3. Register all modules to actually listen to IPC handlers.
 
 `electron.dev.ts:`
 ```typescript
 import {app, BrowserWindow} from 'electron';
-import {ProxyService, DialogProxy, NativeThemeProxy, FileSystemProxy, StoreProxy} from '@lp/electron-bridge';
+import {BridgeService, DialogBridge} from 'electron-bridge/main';
 
-let win: any;
-let proxyService: any;
+let win: BrowserWindow;
+let bridgeService: BridgeService;
+
+app.enableSandbox();
 
 const createWindow = () => {
   win = new BrowserWindow({
     width: 1024,
     height: 768,
     webPreferences: {
-      nodeIntegration: true,
+      nativeWindowOpen: true,
+      nodeIntegration: false,
       contextIsolation: true,
-      sandbox: true
+      enableRemoteModule: false,
       // ...
     }
   });
 
   win.loadFile('index.html');
 
-  // Create proxy service.
-  proxyService = new ProxyService();
+  // Create bridge service.
+  bridgeService = new BridgeService();
 
-  // Append proxy modules that you need and want to expose.
-  proxyService.add(new DialogProxy());
-  proxyService.add(new NativeThemeProxy(win));
-  proxyService.add(new FileSystemProxy());
-  proxyService.add(new StoreProxy(app));
-
-  // Register IPC handlers for each module.
-  proxyService.registerAll();
+  // Append bridges that you need and register all IPC handlers.
+  bridgeService.add(new DialogBridge())
+               .registerAll();
 
   win.on('closed', () => {
-    // Release proxy resources
-    proxyService.releaseAll();
+    // Release bridges resources
+    bridgeService.releaseAll();
 
     win = null;
-    proxyService = null;
+    bridgeService = null;
   });
 };
-
-// ...
 ```
 
-You can also add your own proxy (see Custom module).
+You can also add your own bridge ([see Custom bridge](#custom-bridge)).
 Now that we have registered IPC handlers, we must declare a preload script.
 
 ### 2. Preload script
-Using Context Bridge, it will allow us to expose modules on the renderer process.
-That way, we can expose only what we use:
+Using `context bridge`, it will allows us to expose bridges on the renderer process.
+With `PreloadService`, we can expose only what we want to use:
 
 `electron.preload.ts:`
 ```typescript
-import {modules as defaultModules, expose} from '@lp/electron-bridge';
+import {PreloadService} from 'electron-bridge/preload';
 
-const modules = defaultModules;
+const preloadService = new PreloadService();
 
-expose(...modules);
+preloadService.add('dialog')
+              .expose();
 ```
 
-You must call `expose()` with modules. It will expose for you modules' API using ContextBridge.
-Here you can choose modules you want to expose or not. You can also add your own module (see Custom module).
+Here you add the modules matching the bridges you added in `electron.dev.ts` file.
+You just need to use the `camelCase` name of the bridge, like in Electron documentation (e.g. `nativeTheme`, `powerMonitor`,
+ etc.).
 
-Now Electron needs to know that this script must be preloaded. When creating BrowserWindow, we just need to set the preload
-path of our script like below.
+You can also add your own module. This is further explained below ([see Create a module](#-2.-create-a-module)).
+
+You must call `expose()` in order to expose your modules using `context bridge`.
+
+Now Electron needs to know that this script must be preloaded. When creating a BrowserWindow, we just need to set the 
+preload path of our script like below:
 
 `electron.dev.ts`:
 ```typescript
@@ -111,130 +134,202 @@ win = new BrowserWindow({
     }
 });
 ```
+
 ### 3. Renderer process side
-This example use `dialog` module to open a native dialog picker.
+In your renderer process, aka your application. You can now access exposed bridges like this:
 
 `index.html:`
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    <script>
-        window.dialog.showOpenDialog({title: 'My Awesome Native Dialog', properties: ['openDirectory']})
-                     .then(result => {
-                        if (result.canceled || result.filePaths.length !== 1) {
-                            console.error(`<i-need-a-file />`);
-                            return;
-                        }
-                        console.info(`<file-picker path="${result.filePaths[0]}" />`);
-                     });
-    </script>
-  </body>
+    <meta charset="UTF-8">
+    <title>electron-bridge-test</title>
+</head>
+<body>
+<script>
+window.dialog.showOpenDialog({title: 'My Awesome Native Dialog', properties: ['openDirectory']})
+      .then(result => {
+        if (result.canceled || result.filePaths.length !== 1) {
+          console.error(`<i-need-a-file-and-only-one-file />`);
+          return;
+        }
+        console.info(`<directory path="${result.filePaths[0]}" />`);
+      });
+</script>
+</body>
 </html>
 ```
+As you can see, you can simply use the native `dialog` module from your renderer process.
+You'll notice that it reflects the same API exposed by Electron. This way, you can directly look at Electron's 
+documentation.
 
-You'll notice that it reflects the same API exposed by Electron.
-That way, you can directly look at Electron's documentation.
-
-
-### 4. Run it
-
-You can now execute following command to run electron:
+### 4. Test it
+You can now execute the following command to run electron:
 ```shell script
 $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 ```
 
-## Custom module
+## Custom bridge
 
-### I - Create a proxy
-You must implement AbstractProxy interface in order to register your proxy:
+### 1. Create a bridge
+`Side: main process`
 
-`app.proxy.ts:`
+You must implement Bridge interface in order to register a bridge in the main process:
+
+`src/bridge/main/app.bridge.ts:`
 ```typescript
 import {App, ipcMain} from 'electron';
-import {AbstractProxy} from '@lp/electron-bridge';
+import {Bridge} from 'electron-bridge/main';
 
-export class AppProxy implements AbstractProxy {
+export class AppBridge implements Bridge {
 
     constructor(private app: App) {
         
     }
 
     public register(): void {
-        ipcMain.handle('ep.app.getVersion', async (event: any) => {
+        ipcMain.handle('eb.app.getVersion', (event: any) => {
             return this.app.getVersion();
         });
-        ipcMain.handle('ep.app.getName', async (event: any) => {
+        ipcMain.handle('eb.app.getName', (event: any) => {
             return this.app.getName();
         });
-        ipcMain.handle('ep.app.setName', async (event: any, name: string) => {
-            this.app.setName(name);
+        ipcMain.handle('eb.app.getPath', (event: any, path: string) => {
+            return this.app.getPath(path);
         });
     }
 
     public release(): void {
+        ipcMain.removeHandler('eb.app.getVersion');
+        ipcMain.removeHandler('eb.app.getName');
+        ipcMain.removeHandler('eb.app.getPath');
         // release resources you no longer need.
     }
 
 }
 ```
 
-### II - Create bridge API
+### 2. Create a module
+`Side: preload script`
 
-Write your module using ProxyModule interface:
+Then, you must write your module using BridgeModule interface:
 
-`custom.preload.ts:`
+`src/bridge/preload/app.module.ts:`
 ```typescript
 import {ipcRenderer} from 'electron';
-import {ProxyModule} from '@lp/electron-bridge';
+import {BridgeModule} from 'electron-bridge/preload';
 
-export const AppModule: ProxyModule = {
+export const AppModule: BridgeModule = {
     name: 'app',
+    readonly: true,
     api: {
         getVersion: async () => {
-            return await ipcRenderer.invoke('ep.app.getVersion');
+            return await ipcRenderer.invoke('eb.app.getVersion');
         },
         getName: async () => {
-            return await ipcRenderer.invoke('ep.app.getName');
+            return await ipcRenderer.invoke('eb.app.getName');
         },
-        setName: async (name: string) => {
-            return await ipcRenderer.invoke('ep.app.setName', name);
+        getPath: async (path: string) => {
+            return await ipcRenderer.invoke('eb.app.getPath', path);
         }
     }
 };
 ```
 
-Include your modules in preload script:
+You can now import and add your custom module in the preload script:
 
-`electron.preload.ts:`
+`src/electron.preload.ts:`
 ```typescript
-import {modules as defaultModules, expose} from '@lp/electron-bridge';
-import {AppModule} from 'custom.preload.ts';
+import {PreloadService} from 'electron-bridge/preload';
+import {AppModule} from './bridge/module/app.module.ts';
 
-const modules = defaultModules;
+const preloadService = new PreloadService();
 
-expose(...modules, AppModule);
+preloadService.add('dialog')
+              .add(AppModule)
+              .expose();
 ```
+
+### 3. Create an api declaration
+`Side: your beloved IDE`
+
+Lets write an exported interface for our `app` bridge:
+
+`src/bridge/api/app.api.ts:`
+```typescript
+export interface AppApi {
+    
+    getName(): Promise<string>;
+    getVersion(): Promise<number>;
+    getPath(path: string): Promise<string>;
+
+}
+```
+
+And augment the Window interface:
+
+`renderer.d.ts:`
+```typescript
+declare global {
+    interface Window {
+        app: AppApi;
+    }
+}
+```
+
+### 4. Build it
+Use your preferred package to bundle your application and target each Electron's process. You can find an example using
+[webpack](https://webpack.js.org/) in this configuration file: `./webpack.prod.js`.
+
+And then bundle with:
+```shell script
+$ webpack --config webpack.prod.js
+```
+
+### 5. Test it
+`Side: renderer process`
 
 We can now use our custom module:
 `index.html:`
 ```html
 <!-- ... -->
 <script>
-    console.log(`<my-app name="${window.app.getName()}" version="${window.app.getVersion()}" />`);
+  // ...
+  Promise.all([
+    window.app.getName(),
+    window.app.getVersion(),
+    window.app.getPath('userData')
+  ]).then(([name, version, path]) => {
+    console.log(`<app name="${name}" version="${version}" user-data="${path}" />`);
+  });
 </script>
 <!-- ... -->
 ```
 
+## Security
+This library provides a pattern to quickly access main process features. You are still responsible regarding features 
+you expose to the renderer process ([cf Security considerations](https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations)).
+
+You can quickly implement a logic in your application using the `fileSystem` module and test it. But at the end, you 
+should create your own custom module and always check for bad behaviors.
+
+You can see an example with the `store` module. When `StoreBridge` is created, you give an absolute path (parent) 
+where to store JSON files. You can then create multiple JSON files in this directory using `store.withStore('my/path/db')`.
+Without safety checks, calling `store.withStore('/root/my-store')` would allow **any users** to create a file outside 
+of the given parent `path`.
+
+In this implementation, attempting to resolve the store's path outside of the given parent path will throw an error.
 
 
+## Schemas
+A schema allows you to write a single file to describe a bridge between the main process and the renderer process.
+You can then use `electron-bridge-cli` in `cli/` to generate a bridge file, a module file and an api file.
 
-https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations
+Actually, this package describe `schemas/` and use `electron-bridge-cli` to generate all files under `src/`.
+
+`This is the way.`
+
+## Contributing
+
+Feel free to contribute by creating an issue / submitting a pull-request.  

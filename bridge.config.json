@@ -1,0 +1,8 @@
+{
+  "base": ".",
+  "tsconfig": "tsconfig.json",
+  "schemas": "schemas/",
+  "output": "src/",
+  "main": true,
+  "verbose": false
+}
