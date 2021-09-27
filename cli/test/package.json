@@ -1,0 +1,19 @@
+{
+  "name": "electron-bridge-cli-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "schema": "ebs --config bridge.config.json generate"
+  },
+  "author": "Louis Poirier",
+  "license": "MIT",
+  "dependencies": {
+    "electron-bridge-cli": "file:../dist/",
+    "electron-bridge": "file:../../dist/"
+  },
+  "devDependencies": {
+    "electron": "^14.0.1"
+  }
+}

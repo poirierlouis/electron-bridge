@@ -1,0 +1,41 @@
+{
+  "name": "electron-bridge-cli",
+  "version": "1.0.0",
+  "description": "Tool used to quickly generate bridges for Electron application using schemas.",
+  "author": "Louis Poirier",
+  "license": "MIT",
+  "keywords": [
+    "electron",
+    "bridge",
+    "cli",
+    "schema",
+    "generator",
+    "parser"
+  ],
+  "main": "index.ts",
+  "typings": "index.d.ts",
+  "scripts": {
+    "test": "tsc && node dist/cli.js generate test/bridge.config.json",
+    "clean": "shx rm -rf dist/",
+    "build": "npm run clean && tsc",
+    "build:prod": "npm run clean && tsc && node minify.js",
+    "pack": "node pack.js && npm pack ./dist/"
+  },
+  "bin": {
+    "eb": "./cli.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "ts-morph": "^12.0.0",
+    "yargs": "^17.1.1"
+  },
+  "devDependencies": {
+    "@node-minify/core": "^6.2.0",
+    "@node-minify/uglify-es": "^6.2.0",
+    "@types/yargs": "^17.0.2",
+    "glob": "^7.2.0",
+    "glob-promise": "^4.2.0",
+    "shx": "^0.3.3",
+    "typescript": "^4.4.2"
+  }
+}
