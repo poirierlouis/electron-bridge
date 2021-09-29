@@ -2,7 +2,7 @@
     "base": "test/",
     "tsconfig": "tsconfig.json",
     "schemas": "schemas/",
-    "output": "src/",
+    "output": "src/bridge/",
     "main": false,
-    "verbose": true
+    "verbose": false
 }

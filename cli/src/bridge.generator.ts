@@ -22,7 +22,7 @@ export class BridgeGenerator {
 
     }
 
-    public async generate(schema: Schema): Promise<SourceFile> {
+    public generate(schema: Schema): SourceFile {
         const filePath: string = this.getPath(schema);
         const file: SourceFile = this.project.createSourceFile(filePath, undefined, {overwrite: true});
 

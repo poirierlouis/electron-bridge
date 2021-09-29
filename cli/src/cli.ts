@@ -42,101 +42,137 @@ export class ElectronBridgeCli {
     }
 
     public generate(argv: GenerateArguments): number {
-        try {
-            this.readConfiguration(argv.config);
-            this.prepareProject();
-        } catch (error) {
-            Logger.error(JSON.stringify(error));
-            return 1;
-        }
-        this.generateSchemas();
+        let schemas: Schema[];
+        let files: SchemaFiles[];
+
+        Logger.info(`<electron-bridge-cli version="1.0.0">`)
+              .indent();
+
+        this.readConfiguration(argv.config);
+        this.prepareProject();
+
+        schemas = this.parseSchemas();
+        files = this.generateSchemas(schemas);
+        this.writeSchemas(files);
+
+        Logger.unindent().info(`</project>`)
+              .unindent().info(`</electron-bridge-cli>`);
         return 0;
     }
 
-    private generateSchemas(): void {
+    private parseSchemas(): Schema[] {
         const files: SourceFile[] = this.project.getSourceFiles();
 
         Logger.info(`<parser files="${files.length}">`);
         Logger.indent();
-        const parserPromises: Promise<Schema | null>[] = files.map(file => {
-            return this.parser.parse(file).catch((error) => this.logError(error, file));
-        });
-        let totalSchema: number = 0;
+        const schemas: Schema[] = files.map(file => {
+            try {
+                const schema: Schema = this.parser.parse(file);
+                if (this.config.verbose) {
+                    const fileName: string = path.relative(this.config.schemas, file.getFilePath());
 
-        Promise.all(parserPromises).then(schemas => {
-            const schemasPromises: Promise<SchemaFiles | null>[] = schemas.filter(schema => schema !== null)
-                                                                          .map(schema => <Schema>schema)
-                                                                          .map(schema => {
-                return Promise.all([
-                    this.apiGenerator.generate(schema),
-                    this.moduleGenerator.generate(schema),
-                    this.bridgeGenerator.generate(schema)
-                ]).then(([apiFile, moduleFile, bridgeFile]) => {
-                    return <SchemaFiles>{
-                        apiFile: apiFile,
-                        moduleFile: moduleFile,
-                        bridgeFile: bridgeFile
-                    };
-                }).catch((error) => this.logError(error, schema.sourceFile));
-            });
-            totalSchema = schemasPromises.length;
-
-            if (totalSchema === files.length) {
-                Logger.info(`<result message="Detected all files as schemas (${totalSchema})." />`);
-            } else {
-                Logger.warn(`<result message="Detected only ${totalSchema} valid schemas." />`);
+                    Logger.log(`<parsed file="${fileName}" lines="${file.getEndLineNumber()}" />`);
+                }
+                return schema;
+            } catch (error) {
+                this.logError(error, file);
+                return null;
             }
-            return Promise.all(schemasPromises);
-        }).then(files => {
-            Logger.unindent()
-                  .info(`</parser>`)
-                  .info(``)
-                  .info(`<generator>`)
-                  .indent();
-            const promises = files.filter(files => files !== null)
-                                  .map(files => <SchemaFiles>files)
-                                  .map(files => {
-                const schemaFile: SourceFile[] = [files.apiFile, files.moduleFile, files.bridgeFile];
-                const promises: Promise<void>[] = schemaFile.map(file => {
-                    const fileName: string = path.relative(this.config.output, file.getFilePath());
+        }).filter(schema => {
+            return schema !== null;
+        }).map(schema => <Schema>schema);
 
-                    return file.save()
-                               .then(() => {
-                                   if (!this.config.verbose) {
-                                       return;
-                                   }
-                                   Logger.info(`<generated file="${fileName}" />`);
-                               })
-                               .catch(error => {
-                                   Logger.error(`<error type="unknown" file="${fileName}" message="${error}" />`);
-                               });
-                });
+        if (schemas.length === files.length) {
+            Logger.info(`<result message="Detected all files as schemas (${schemas.length})." />`);
+        } else {
+            Logger.info();
+            Logger.warn(`<result message="Detected only ${schemas.length} valid schemas." />`);
+        }
+        Logger.unindent().info(`</parser>`);
+        return schemas;
+    }
 
-                return Promise.all(promises);
-             });
+    private generateSchemas(schemas: Schema[]): SchemaFiles[] {
+        let files: SchemaFiles[];
 
-            return Promise.all(promises);
-        }).then(saves => {
-            if (totalSchema === saves.length) {
-                Logger.info(`<result message="Generated all bridge files with success." />`);
-            } else {
-                Logger.warn(`<result message="Generated only ${saves.length} / ${totalSchema} bridge files." />`);
+        Logger.info(``)
+              .info(`<generator>`)
+              .indent();
+        files = schemas.map(schema => {
+            const schemaFiles: SchemaFiles = {
+                fileName: schema.fileName,
+                sourceFile: schema.sourceFile,
+                apiFile: null,
+                moduleFile: null,
+                bridgeFile: null
+            };
+
+            try {
+                schemaFiles.apiFile = this.apiGenerator.generate(schema);
+                schemaFiles.moduleFile = this.moduleGenerator.generate(schema);
+                schemaFiles.bridgeFile = this.bridgeGenerator.generate(schema);
+            } catch (error) {
+                this.logError(error, schema.sourceFile);
+                return null;
             }
-            Logger.unindent().info(`</generator>`);
-            Logger.unindent().info(`</project>`);
             if (this.config.verbose) {
-                Logger.unindent().info(`</electron-bridge-cli>`);
+                const fileName: string = path.relative(this.config.schemas, schema.sourceFile.getFilePath());
+                let lines: number = 0;
+                let roi: number;
+
+                lines += schemaFiles.apiFile.getEndLineNumber();
+                lines += schemaFiles.moduleFile.getEndLineNumber();
+                lines += schemaFiles.bridgeFile.getEndLineNumber();
+                roi = 100 - Math.round((schema.sourceFile.getEndLineNumber() / lines) * 100);
+                Logger.log(`<generated file="${fileName}" total-lines="${lines}" roi="${roi} %" />`);
+            }
+            return schemaFiles;
+        });
+
+        const size: number = schemas.length;
+
+        files = files.filter(schema => schema !== null);
+
+        const schemasLines: number = schemas.map(schema => schema.sourceFile.getEndLineNumber())
+                                            .reduce((previous, current) => previous + current);
+        const filesLines: number = files.map(schema => {
+            return schema.apiFile.getEndLineNumber() +
+                   schema.moduleFile.getEndLineNumber() +
+                   schema.bridgeFile.getEndLineNumber();
+        }).reduce((previous, current) => previous + current);
+        const roi: number = 100 - Math.round(schemasLines / filesLines * 100);
+
+        if (schemas.length === size) {
+            if (this.config.verbose) {
+                Logger.info();
+            }
+            Logger.info(`<result message="Generated all bridge files with success." roi="${roi} %" total-lines="${schemasLines} / ${filesLines}" />`);
+        } else {
+            Logger.info();
+            Logger.warn(`<result message="Generated only ${schemas.length} / ${size} bridge files." roi="${roi} %" total-lines="${schemasLines} / ${filesLines}" />`);
+        }
+        Logger.unindent().info(`</generator>`);
+        return files;
+    }
+
+    private writeSchemas(schemas: SchemaFiles[]): void {
+        schemas.forEach(files => {
+            try {
+                files.apiFile.saveSync();
+                files.moduleFile.saveSync();
+                files.bridgeFile.saveSync();
+            } catch (error) {
+                Logger.error(`<error type="unknown" file="${files.fileName}" message="${error}" />`);
             }
         });
     }
 
-    private logError(error: any, file: SourceFile): null {
+    private logError(error: any, file: SourceFile): void {
         if (error instanceof AbstractError) {
             Logger.warn(error.message);
         } else {
             Logger.error(`<error type="unknown" file="${path.relative(this.config.schemas, file.getFilePath())}" message="${error}" />`);
         }
-        return null;
     }
 
     private prepareProject(): void {
@@ -149,12 +185,12 @@ export class ElectronBridgeCli {
         });
         this.project.addSourceFilesAtPaths(globPath);
         //this.project.resolveSourceFileDependencies();
-        Logger.info(`<project path="${globPath}">`);
-        Logger.indent();
         this.parser = new SchemaParser(this.config);
         this.apiGenerator = new ApiGenerator(this.project, this.config);
         this.moduleGenerator = new ModuleGenerator(this.project, this.config);
         this.bridgeGenerator = new BridgeGenerator(this.project, this.config);
+        Logger.info(`<project path="${globPath}">`);
+        Logger.indent();
     }
 
     private readConfiguration(path: string): void {
@@ -169,10 +205,8 @@ export class ElectronBridgeCli {
         this.config.verbose = (data.verbose) ? data.verbose : false;
         Logger.withLevel((this.config.verbose) ? LogLevel.LOG : LogLevel.INFO);
         if (this.config.verbose) {
-            Logger.info(`<electron-bridge-cli version="1.0.0">`)
-                  .indent()
-                  .log(`<config base="${this.config.base}" tsconfig="${this.config.tsconfig}" schemas="${this.config.schemas}" output="${this.config.output}" main="${this.config.main}" verbose="true" />`)
-
+            Logger.log(`<config base="${this.config.base}" tsconfig="${this.config.tsconfig}" schemas="${this.config.schemas}" output="${this.config.output}" main="${this.config.main}" verbose="true" />`);
+            Logger.log();
         }
     }
 

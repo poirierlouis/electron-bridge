@@ -23,7 +23,7 @@ You can provide a configuration file to `electron-bridge-cli` with the following
   "base": ".",
   "tsconfig": "tsconfig.json",
   "schemas": "schemas/",
-  "output": "src/",
+  "output": "src/bridge/",
   "main": false,
   "verbose": false
 }
@@ -34,12 +34,12 @@ You can provide a configuration file to `electron-bridge-cli` with the following
 | base     |             "." | Path used to target a directory other than current working directory. |
 | tsconfig | "tsconfig.json" | Path to the tsconfig.json file of your project.                       |
 | schemas  |      "schemas/" | Path where to look for schemas to parse.                              |
-| output   |          "src/" | Path where to generate output files.                                  |
+| output   |   "src/bridge/" | Path where to generate output files.                                  |
 | main     |           false | true when used within `electron-bridge`, false otherwise.             |
 | verbose  |           false | true to show more logs, false otherwise.                              |
 
-Be reusing your project `tsconfig.json` file, `electron-bridge` will generate files with the same configuration and therefore
-provides the same indentation, new line kind, ... as your project.
+By reusing your project `tsconfig.json` file, `electron-bridge-cli` will generate files with the same configuration and 
+therefore provides the same indentation, new line kind, etc. as your project.
 
 When generating files from schemas, `electron-bridge` interfaces are imported for you:
 - when working on `electron-bridge`, you need to set `"main": true` to import modules relative to the package (e.g. `import {Bridge} from './bridge.ts'`).
@@ -50,9 +50,9 @@ Each schema will be generated in the `output` path using this structure:
 ```
 ${output}
   |
-  |-- main/             contains bridge classes (*.bridge.ts)
-  |-- preload/          contains module classes (*.module.ts)
-  |-- renderer/         contains api interfaces (*.api.ts) and augmented Window (renderer.d.ts)
+  |-- main/           # contains bridge classes (*.bridge.ts)
+  |-- preload/        # contains module classes (*.module.ts)
+  |-- renderer/       # contains api interfaces (*.api.ts) and augmented Window (renderer.d.ts)
 ```
 
 ## Schema
@@ -120,7 +120,7 @@ export class NativeTheme {
 You can see that the code is pretty simple to write and understand. Lets dive into the specifics.
 
 #### 1. Schema decorator and class declaration
-You **must** decorate the class for which you want to create a bridge, a module and an api declaration.
+You **must** decorate the class for which you want to create a bridge, a module and an api interface.
 
 You **must** indicate a value for the parameter `readonly`:
 - `true` means this bridge behaves without using any write operations on the user's device.
@@ -143,7 +143,7 @@ export class NativeTheme {
 ```
 
 #### 2. Class
-If you provide documentation for your class, it will be reused in the api declaration file.
+If you provide documentation for your class, it will be reused in the api interface file.
 
 #### 3. Constructor
 You can declare it or not, it will be reused as-this in the bridge file.
@@ -206,7 +206,7 @@ Here is where all the fun is happening:
 The name of the function will be used to define a unique IPC handler.
 And `electron-bridge` will take care of the rest for you!
 
-Documentation of a public function will be included in the api declaration file.
+Documentation of a public function will be included in the api interface file.
 
 > schemas/native-theme.ts
 ```typescript
@@ -295,8 +295,8 @@ export class NativeTheme {
 
 #### 8. Exported classes and interfaces
 
-You can write exported classes and interfaces. They will only be included in the api declaration file.
-If you use them in the bridge class, they will be imported from the api declaration module.
+You can write exported classes and interfaces. They will only be included in the api interface file.
+If you use them in the bridge class, they will be imported from the api interface module.
 
 > schemas/native-theme.ts
 ```typescript
@@ -314,7 +314,7 @@ export interface ThemeUpdatedEvent {
 For one schema, three files are generated: a bridge class, a module interface and an api interface.
 With our current schema, `electron-bridge-cli` would create the following files after executing `eb generate ./bridge.config.json`:
 
-> src/main/native-theme.bridge.ts
+> src/bridge/main/native-theme.bridge.ts
 ```typescript
 import {BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeTheme} from 'electron';
 import {Bridge} from 'electron-bridge-cli/main';
@@ -352,7 +352,7 @@ export class NativeThemeBridge implements Bridge {
 }
 ```
 
-> src/preload/native-theme.module.ts
+> src/bridge/preload/native-theme.module.ts
 ```typescript
 import {ipcRenderer, IpcRendererEvent} from 'electron';
 import {BridgeModule} from 'electron-bridge-cli/preload';
@@ -377,7 +377,7 @@ export const NativeThemeModule: BridgeModule = {
 };
 ```
 
-> src/renderer/native-theme.api.ts
+> src/bridge/renderer/native-theme.api.ts
 ```typescript
 /**
  * Emitted when something in the underlying NativeTheme has changed.
@@ -403,7 +403,7 @@ export interface NativeThemeApi {
 }
 ```
 
-> renderer/renderer.d.ts
+> src/bridge/renderer/renderer.d.ts
 ```typescript
 import {NativeThemeApi} from './native-theme.api';
 
