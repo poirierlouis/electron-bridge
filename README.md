@@ -19,8 +19,7 @@ electron-bridge     /you are here\
   |-- demo/         a demo to quickly try common modules.
   |-- cli/          electron-bridge-cli package to generate schemas.
   |-- schemas/      schemas of the Electron's main process modules to generate and expose.
-  |-- src/          well...
-
+  |-- src/          source files generated from schemas
 ```
 
 ## Install
@@ -29,18 +28,20 @@ $ npm install --save-dev electron-bridge
 ```
 
 ## Naming convention
-Here is a brief description of the names used, so that we are in the page.
+Here is a brief description of the names used, so that we are on the same page:
 
-- a `MySomethingBridge` is a class used in the main process.
-- a `MySomethingModule` is an object used in the preload script.
-- a `MySomethingApi` is a declaration used in a renderer process.
+|               Path | File                   | Symbol            | Description                             |
+|-------------------:|:-----------------------|-------------------|-----------------------------------------|
+| ./bridge/main/     | my-something.bridge.ts | MySomethingBridge | Class used in the main process.         |
+| ./bridge/preload/  | my-something.module.ts | MySomethingModule | Object used in the preload script.      |
+| ./bridge/renderer/ | my-something.api.ts    | MySomethingApi    | Interface used in the renderer process. |
+|                    |                        |                   |                                         |
+| ./bridge/renderer/ | renderer.d.ts          | Window            | Augment Window with bridge's api.       |
 
-With this example you must expect:
-- files to be named `my-something.<bridge|module|api>.ts`.
-- IPC channel to be named `eb.mySomething.<functionName>`. 
+With this example, you must expect IPC channels to be named `eb.mySomething.<functionName>`.
 
-Finally `common bridges` means exposed Electron's main features (e.g. nativeTheme, powerMonitor, etc.). It also contains 
-homemade bridges for the benefit of all developers.
+Finally `common bridges` means exposed Electron's main features (e.g. `nativeTheme`, `powerMonitor`, etc.). It also 
+contains homemade bridges for the benefit of all developers.
 
 ## How to use
 
@@ -160,22 +161,25 @@ window.dialog.showOpenDialog({title: 'My Awesome Native Dialog', properties: ['o
 </body>
 </html>
 ```
+
 As you can see, you can simply use the native `dialog` module from your renderer process.
 You'll notice that it reflects the same API exposed by Electron. This way, you can directly look at Electron's 
 documentation.
 
 ### 4. Test it
 You can now execute the following command to run electron:
+
 ```shell script
 $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 ```
 
 ## Custom bridge
+You will now learn how to write your own `bridge` which is composed of three files.
 
 ### 1. Create a bridge
-`Side: main process`
+> Side: main process
 
-You must implement Bridge interface in order to register a bridge in the main process:
+You must implement a Bridge interface in order to register it in the main process:
 
 > src/bridge/main/app.bridge.ts
 ```typescript
@@ -212,7 +216,7 @@ export class AppBridge implements Bridge {
 ```
 
 ### 2. Create a module
-`Side: preload script`
+> Side: preload script
 
 Then, you must write your module using BridgeModule interface:
 
@@ -253,11 +257,11 @@ preloadService.add('dialog')
 ```
 
 ### 3. Create an api declaration
-`Side: your beloved IDE`
+> Side: your beloved IDE
 
-Lets write an exported interface for our `app` bridge:
+Lets write an exported interface for our bridge:
 
-> src/bridge/api/app.api.ts
+> src/bridge/renderer/app.api.ts
 ```typescript
 export interface AppApi {
     
@@ -270,8 +274,10 @@ export interface AppApi {
 
 And augment the Window interface:
 
-> renderer.d.ts
+> src/bridge/renderer/renderer.d.ts
 ```typescript
+import {AppApi} from './app.api';
+
 declare global {
     interface Window {
         app: AppApi;
@@ -282,8 +288,9 @@ declare global {
 ### 4. Build it
 Use your preferred package to bundle your application and target each Electron's process. You can find an example using
 [webpack](https://webpack.js.org/) with this repository configuration file: `./webpack.dev.js`.
+You should edit this configuration to match your project.
 
-And then bundle with:
+You can then bundle with:
 ```shell script
 $ webpack --config webpack.dev.js
 ```
@@ -333,4 +340,4 @@ Actually, this package describe `schemas/` and use `electron-bridge-cli` to gene
 
 ## Contributing
 
-Feel free to contribute by creating an issue / submitting a pull-request.  
+Feel free to contribute by creating an issue / submitting a pull-request.
