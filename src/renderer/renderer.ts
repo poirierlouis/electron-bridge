@@ -6,8 +6,10 @@ import { PathApi } from "./path.api";
 import { PowerMonitorApi } from "./power-monitor.api";
 import { StoreApi } from "./store.api";
 
-declare global {
-    interface Window {
+declare global
+{
+    interface Window
+    {
         autoUpdater: AutoUpdaterApi;
         dialog: DialogApi;
         fileSystem: FileSystemApi;
@@ -17,4 +19,3 @@ declare global {
         store: StoreApi;
     }
 }
-

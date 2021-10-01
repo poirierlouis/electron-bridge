@@ -1,7 +1,8 @@
 {
-    "files": ["src/**/*.{html,css,js}"],
+    "files": ["dist/**/*.{html,css,js}"],
     "watchOptions": {"ignored": "node_modules"},
     "server": {
-        "baseDir": "./src/"
-    }
+        "baseDir": "./dist/"
+    },
+    "open": false
 }

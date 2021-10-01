@@ -1,5 +1,5 @@
 
-export type PathLike = string | Buffer;
+export type PathLike = string | Buffer | URL;
 export type BufferEncoding = 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex';
 export type OpenMode = number | string;
 export type Mode = number | string;

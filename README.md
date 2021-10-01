@@ -11,21 +11,28 @@ Therefore, `electron-bridge` use [Inter-Process Communication](https://www.elect
 [context bridge](https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations) 
 compatible with a [sandbox](https://www.electronjs.org/docs/latest/tutorial/sandbox) environment.
 
+
+
 ## Repository
 This is a monorepo containing two packages:
+
 ```
-electron-bridge     /you are here\
+electron-bridge
   |
-  |-- demo/         a demo to quickly try common modules.
-  |-- cli/          electron-bridge-cli package to generate schemas.
-  |-- schemas/      schemas of the Electron's main process modules to generate and expose.
-  |-- src/          source files generated from schemas
+  |-- demo/         # a demo to quickly try common modules.
+  |-- cli/          # electron-bridge-cli package to generate schemas.
+  |-- schemas/      # schemas of the Electron's main process modules to generate and expose.
+  |-- src/          # source files generated from schemas.
 ```
+
+
 
 ## Install
 ```shell script
-$ npm install --save-dev electron-bridge
+$ npm install --save electron-bridge
 ```
+
+
 
 ## Naming convention
 Here is a brief description of the names used, so that we are on the same page:
@@ -43,7 +50,26 @@ With this example, you must expect IPC channels to be named `eb.mySomething.<fun
 Finally `common bridges` means exposed Electron's main features (e.g. `nativeTheme`, `powerMonitor`, etc.). It also 
 contains homemade bridges for the benefit of all developers.
 
-## How to use
+
+
+## Bridges
+This table shows you currently implemented bridges:
+
+|       Bridge | Native Electron module? | Description      |
+|-------------:|:-----------------------:|------------------|
+|  autoUpdater |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater) |
+|       dialog |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog) |
+|   fileSystem |                      no | Homemade wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
+|  nativeTheme |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme) |
+|         path |                      no | Homemade wrapper for Node.js [path](https://nodejs.org/api/path.html) module. |
+| powerMonitor |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
+|        store |                      no | Homemade JSON key/value storage solution. |
+
+You can see usage of each bridge by running the `demo/`.
+
+
+
+## Usage
 
 ### 1. Main process side
 In your electron entry-point:
@@ -172,6 +198,8 @@ You can now execute the following command to run electron:
 ```shell script
 $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 ```
+
+
 
 ## Custom bridge
 You will now learn how to write your own `bridge` which is composed of three files.
@@ -315,6 +343,8 @@ We can now use our custom module:
 <!-- ... -->
 ```
 
+
+
 ## Security
 This library provides a pattern to quickly access main process features. You are still responsible regarding features 
 you expose to the renderer process ([cf Security considerations](https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations)).
@@ -330,6 +360,7 @@ of the given parent `path`.
 In this implementation, attempting to resolve the store's path outside of the given parent path will throw an error.
 
 
+
 ## Schemas
 A schema allows you to write a single file to describe a bridge between the main process and the renderer process.
 You can then use `electron-bridge-cli` in `cli/` to generate a bridge file, a module file and an api file.
@@ -338,6 +369,11 @@ Actually, this package describe `schemas/` and use `electron-bridge-cli` to gene
 
 > This is the way.
 
+
+
 ## Contributing
 
 Feel free to contribute by creating an issue / submitting a pull-request.
+
+If you wish to propose a new bridge, create an issue to discuss about it, or just submit a PR if you already wrote it.
+Please remember that one bridge = one schema.

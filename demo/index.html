@@ -2,7 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <!-- Do not use in production! -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval';">
+
     <title>electron-bridge</title>
+
     <style>
         html, body {
             height: 100%;
@@ -56,7 +60,7 @@
         }
 
         .tabs button:hover,
-        .tabs button:active {
+        .tabs button.active {
             cursor: pointer;
             border-color: #7a11bb;
             background-color: #7a11bb7f;
@@ -83,6 +87,10 @@
         .form-field {
             display: flex;
             width: 100%;
+        }
+
+        textarea {
+            height: inherit;
         }
     </style>
 </head>
@@ -112,7 +120,7 @@
     <div id="native-theme" class="tab">
         <p class="form-field">
             <label for="theme-source">Set theme source</label>
-            <select id="theme-source" onchange="onThemeSourceChanged()">
+            <select id="theme-source">
                 <option value="system">System</option>
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -148,128 +156,72 @@
         <p>
             <label for="store-path">Enter a store path:</label>
             <input id="store-path" type="text" value="store">
-            <button onclick="onStoreChanged()">Change store</button>
+            <button id="store-button">Change store</button>
         </p>
 
         <div>
+            <textarea id="store-tree"></textarea>
 
+            <form>
+                <p>Set key / value:</p>
+                <input id="store-key" type="text" name="store-key" placeholder="key" required>
+                <input id="store-value" type="text" name="store-value" placeholder="value" required>
+
+                <button type="submit" onclick="onStoreSet()">Set</button>
+            </form>
         </div>
     </div>
 </section>
-<script>
-    let currentTab = 'power-monitor';
-    let currentStore = 'store';
-
-    function load() {
-        // Tabs header logic
-        loadTabsHeader();
-
-        // Load tabs
-        loadDialog();
-        loadNativeTheme();
-        loadPowerMonitor();
-        loadStore();
-    }
-
-    // #region Dialog
-
-    function loadDialog() {
-        const $openDialog = document.querySelector('#open-dialog');
-        const $path = document.querySelector('#path');
-        const $error = document.querySelector('#error');
-
-        $openDialog.addEventListener('click', () => {
-            dialog.showOpenDialog({
-                title: 'My Awesome Dialog',
-                properties: ['openFile'],
-                filters: [
-                    {name: 'Awesome File', extensions: ['txt', 'json']}
-                ]
-            }).then(result => {
-                if (result.canceled || result.filePaths.length !== 1) {
-                    console.warn(`<i-need-an-awesome-file />`);
-                    return;
-                }
-                $path.value = result.filePaths[0];
-            }).catch(error => {
-
-            });
-        });
-    }
-
-    // #endregion
-
-
-
-    // #region Native Theme
-
-    function loadNativeTheme() {
-        const $shouldUseDarkColors = document.querySelector('#shouldUseDarkColors');
-        const $shouldUseHighContrastColors = document.querySelector('#shouldUseHighContrastColors');
-        const $shouldUseInvertedColorScheme = document.querySelector('#shouldUseInvertedColorScheme');
-
-        nativeTheme.onUpdated(event => {
-            $shouldUseDarkColors.checked = event.shouldUseDarkColors;
-            $shouldUseHighContrastColors.checked = event.shouldUseHighContrastColors;
-            $shouldUseInvertedColorScheme.checked = event.shouldUseInvertedColorScheme;
-        });
-    }
-
-    function onThemeSourceChanged() {
-        const $themeSource = document.querySelector('#theme-source');
-
-        nativeTheme.themeSource($themeSource.value);
-    }
-
-    // #endregion
-
-
-
-    // #region PowerMonitor
-
-    function loadPowerMonitor() {
-        powerMonitor.isOnBatteryPower().then(updateIsOnBatteryPower);
-        powerMonitor.onBattery(() => updateIsOnBatteryPower(true));
-        powerMonitor.onAc(() => updateIsOnBatteryPower(false));
-        powerMonitor.onLockScreen(() => appendEvent('receive: lock-screen'));
-        powerMonitor.onUnlockScreen(() => appendEvent('receive: unlock-screen'));
-        powerMonitor.onSuspend(() => appendEvent('receive: suspend'));
-        powerMonitor.onResume(() => appendEvent('receive: resume'));
-    }
-
-    function appendEvent(message) {
-        const $events = document.querySelector('#power-monitor #events');
-
-        $events.value = `${message}\r\n${$events.value}`;
-    }
-
-    function updateIsOnBatteryPower(isOnBatteryPower) {
-        const $isOnBatteryPower = document.querySelector('#power-monitor #isOnBatteryPower');
-
-        $isOnBatteryPower.innerHTML = (isOnBatteryPower) ? 'yes' : 'no';
-        appendEvent((isOnBatteryPower) ? 'receive: battery' : 'receive: ac');
-    }
-
-    // #endregion
-
-
-
-    // #region PowerMonitor
-
+<script>global = globalThis;</script>
+<script src="index.js"></script>
+<!--
     function loadStore() {
-        store.withStore(currentStore);
+        const $storeTree = document.querySelector('#store #store-tree');
+
+        store.withStore(currentStore).then(() => {
+            return store.get('peoples');
+        }).then(peoples => {
+            if (!peoples) {
+                return;
+            }
+            $storeTree.innerHTML = beautify(peoples);
+        });
     }
 
     function onStoreChanged() {
+        const $storeTree = document.querySelector('#store #store-tree');
         const $storePath = document.querySelector('#store #storePath');
         const $storePathInput = document.querySelector('#store #store-path');
 
-        $storePath.innerText = `'${currentStore}'`;
+        $storePath.innerHTML = `'${currentStore}'`;
         store.withStore($storePathInput.value).then(() => {
             currentStore = $storePathInput.value;
+            $storeTree.innerHTML = '';
         }).catch((error) => {
             alert(error)
         });
+    }
+
+    function onStoreSet() {
+        const $storeTree = document.querySelector('#store #store-tree');
+        const $storeKey = document.querySelector('#store #store-key');
+        const $storeValue = document.querySelector('#store #store-value');
+
+        const key = $storeKey.value;
+        const value = JSON.parse($storeValue.value);
+
+        store.set(key, value).then(() => {
+            return store.get(key);
+        }).then(value => {
+            console.log(value);
+            $storeTree.innerHTML = beautify(value);
+        }).catch(error => {
+            console.error(error);
+        });
+    }
+
+    function beautify(data) {
+        return JSON.stringify(data);
     }
 
     // #endregion
@@ -315,6 +267,6 @@
     load();
 
     // #endregion
-</script>
+</script>-->
 </body>
 </html>

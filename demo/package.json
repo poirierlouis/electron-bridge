@@ -7,17 +7,19 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preload": "webpack --config webpack.preload.config.js",
-    "electron": "tsc src/electron.dev.ts && electron src/electron.dev.js"
+    "build": "webpack --config webpack.dev.config.js",
+    "serve": "lite-server",
+    "electron": "tsc electron.dev.ts && electron electron.dev.js"
   },
   "dependencies": {
     "electron-bridge": "file:../electron-bridge-1.0.0.tgz"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "^9.0.1",
     "electron": "^14.0.0",
-    "lite-server": "^2.6.1",
     "ts-loader": "^9.2.5",
     "webpack": "^5.52.0",
-    "webpack-cli": "^4.8.0"
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.3.0"
   }
 }

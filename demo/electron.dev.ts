@@ -19,7 +19,7 @@ function createWindow() {
     });
 
     win.loadURL(`http://localhost:3000`).then(() => {
-        console.log(`<lite-server connected />`);
+        console.log(`<electron webpack-dev-server::connected />`);
     });
 
     const bridge = new BridgeService();
