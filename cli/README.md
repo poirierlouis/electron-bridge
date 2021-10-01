@@ -1,6 +1,6 @@
 # electron-bridge-cli
 
-`electron-bridge-cli` is a tool to quickly create bridges for [electron-bridge](../).
+`electron-bridge-cli` is a tool to quickly create bridges for [electron-bridge](https://github.com/poirierlouis/electron-bridge).
 This is used internally to generate source files in `electron-bridge`.
 You can use this command line interface to create your own custom modules.
 
@@ -117,10 +117,24 @@ export class NativeTheme {
 }
 ```
 
-You can see that the code is pretty simple to write and understand. Lets dive into the specifics.
+You can see that the code is pretty simple to write and understand.
+You can look at the generated code that `eb generate ./bridge.config.json` command would produce, 
+[here](#output).
+
+Lets dive into the specifics of this format.
 
 #### 1. Schema decorator and class declaration
-You **must** decorate the class for which you want to create a bridge, a module and an api interface.
+> schemas/native-theme.ts
+```typescript
+import {Schema} from 'electron-bridge-cli';
+
+@Schema(false)
+export class NativeTheme {
+    // ...
+}
+```
+
+You **must** decorate the class for which you want to create a bridge, a module and an api interface using `@Schema()`.
 
 You **must** indicate a value for the parameter `readonly`:
 - `true` means this bridge behaves without using any write operations on the user's device.
@@ -131,28 +145,26 @@ You **must** indicate a value for the parameter `readonly`:
 
 You **must** export the class along with the decorator in order to be parsed by the tool.
 
-You **must** declare only one exported class with the @Schema decorator per file.
+You **must** declare one and only one exported class with the `@Schema` decorator per file.
 
+#### 2. Class
+
+> schemas/native-theme.ts
 ```typescript
-import {Schema} from 'electron-bridge-cli';
+// ...
 
+/**
+ * Read and respond to changes in Chromium's native color theme.
+ */
 @Schema(false)
 export class NativeTheme {
     // ...
 }
 ```
 
-#### 2. Class
 If you provide documentation for your class, it will be reused in the api interface file.
 
 #### 3. Constructor
-You can declare it or not, it will be reused as-this in the bridge file.
-
-If you need external dependencies from your Electron app file (`electron.dev.ts`), you can add parameters to the
-constructor. You will then be able to call the constructor by passing such dependencies.
-
-An example might be to pass your BrowserWindow instance in order to send events to the renderer process.
-
 > schemas/native-theme.ts
 ```typescript
 // ...
@@ -167,16 +179,14 @@ export class NativeTheme {
   // ...
 ```
 
+You can declare it or not, it will be reused as-this in the bridge file.
+
+If you need external dependencies from your Electron app file (`electron.dev.ts`), you can add parameters to the
+constructor. You will then be able to call the constructor by passing such dependencies.
+
+An example might be to pass your BrowserWindow instance in order to send events to the renderer process.
+
 #### 4. Lifecycle
-In the main process, your bridge instance will be registered when Electron app initialize, which is after you 
-create a BrowserWindow. You *can* override `register()` to initialize stuff, add event listeners, etc.
-
-When your Electron application [will-quit](https://www.electronjs.org/docs/latest/api/app#event-will-quit), you *can* 
-override `release()` to dispose off stuff, remove event listeners, etc.
-
-NB: bridge classes contains generated IPC handlers in `register()` and remove handlers in `release()`. When you override
-these functions, your code will be appended at the beginning of the function, and the generated code at the end.
-
 > schemas/native-theme.ts
 ```typescript
 // ...
@@ -195,19 +205,16 @@ export class NativeTheme {
   // ...
 ```
 
+In the main process, your bridge instance will be registered when Electron app initialize, which is after you 
+create a BrowserWindow. You *can* override `register()` to initialize stuff, add event listeners, etc.
+
+When your Electron window [closed](https://www.electronjs.org/docs/latest/api/browser-window#event-closed), you *can* 
+override `release()` to dispose off stuff, remove event listeners, etc.
+
+NB: bridge classes contains generated IPC handlers in `register()` and remove handlers in `release()`. When you override
+these functions, your code will be appended at the beginning of the function, and the generated code at the end.
+
 #### 5. Public functions
-Here is where all the fun is happening:
-- you **must** declare public a function you want to expose in the renderer process.
-- you declare a function's signature that you want to expose in the renderer process.
-- you write in the function the code that you want to be executed in the main process.
-- you **must** set `async` to a function and returns with a `Promise<void>` or `Promise<something>`.
-- you **can** declare a synchronous function and return `void` when it has a `fire-and-forget` kind logic.
-
-The name of the function will be used to define a unique IPC handler.
-And `electron-bridge` will take care of the rest for you!
-
-Documentation of a public function will be included in the api interface file.
-
 > schemas/native-theme.ts
 ```typescript
 import {nativeTheme} from 'electron';
@@ -232,21 +239,19 @@ export class NativeTheme {
 }
 ```
 
+Here is where all the fun is happening:
+- you **must** declare public a function you want to expose in the renderer process.
+- you declare a function's signature that you want to expose in the renderer process.
+- you write in the function the code that you want to be executed in the main process.
+- you **must** set `async` to a function and returns with a `Promise<void>` or `Promise<something>`.
+- you **can** declare a synchronous function and return `void` when it has a `fire-and-forget` kind logic.
+
+The name of the function will be used to define a unique IPC handler.
+And `electron-bridge-cli` will take care of the rest for you!
+
+Documentation of a public function will be included in the api interface file.
+
 #### 6. EventListener decorator
-You can expose event listeners by declaring a public function using a callback parameter:
-- you **must** decorate your function with @EventListener.
-- you **must** indicate the event name used for IPC channel.
-- any code in the function will be **ignored**.
-
-**Important:** you are still responsible for sending an event from the main process to the renderer process.
-You **can** do so by using `WebContents` from your `BrowserWindow`:
-
-`this.win.webContents.send('eb.[myBridge].[event-name]'/*, ...args*/);`.
-- `[myBridge]` becomes `nativeTheme`.
-- `[event-name]` becomes `updated`.
-
-With this example, you can find it in `emitUpdated()`.
-
 > schemas/native-theme.ts
 ```typescript
 // ...
@@ -263,15 +268,21 @@ export class NativeTheme {
 }
 ```
 
+You can expose event listeners by declaring a public function using a callback parameter:
+- you **must** decorate your function with @EventListener.
+- you **must** indicate the event name used for IPC channel.
+- any code in the function will be **ignored**.
+
+**Important:** you are still responsible for sending an event from the main process to the renderer process.
+You **can** do so by using `WebContents` from your `BrowserWindow`:
+
+`this.win.webContents.send('eb.[myBridge].[event-name]'/*, ...args*/);`.
+- `[myBridge]` becomes `nativeTheme`.
+- `[event-name]` becomes `updated`.
+
+You can find an example in `emitUpdated()`.
+
 #### 7. Private functions, classes and interfaces
-
-- any private / protected functions
-- any properties / getters / setters
-- any interfaces not exported
-- any classes not exported
-
-will only be included in the bridge class.
-
 > schemas/native-theme.ts
 ```typescript
 import {nativeTheme} from 'electron';
@@ -293,11 +304,14 @@ export class NativeTheme {
 }
 ```
 
+- any private / protected functions
+- any properties / getters / setters
+- any interfaces not exported
+- any classes not exported
+
+will only be included in the bridge class.
+
 #### 8. Exported classes and interfaces
-
-You can write exported classes and interfaces. They will only be included in the api interface file.
-If you use them in the bridge class, they will be imported from the api interface module.
-
 > schemas/native-theme.ts
 ```typescript
 /**
@@ -310,9 +324,13 @@ export interface ThemeUpdatedEvent {
 }
 ```
 
-#### 9. Generated files
+You can write exported classes and interfaces. They will only be included in the api interface file.
+If you use them in the bridge class, they will be imported from the api interface module.
+
+## Output
 For one schema, three files are generated: a bridge class, a module interface and an api interface.
-With our current schema, `electron-bridge-cli` would create the following files after executing `eb generate ./bridge.config.json`:
+With our current schema, `electron-bridge-cli` would create the following files after executing 
+`eb generate ./bridge.config.json`:
 
 > src/bridge/main/native-theme.bridge.ts
 ```typescript
@@ -403,7 +421,7 @@ export interface NativeThemeApi {
 }
 ```
 
-> src/bridge/renderer/renderer.d.ts
+> src/bridge/renderer/renderer.ts
 ```typescript
 import {NativeThemeApi} from './native-theme.api';
 
@@ -413,3 +431,25 @@ declare global {
   }
 }
 ```
+
+## ROI
+> Why not?
+
+For each schema, the number of lines is compared to the total number of lines from generated files. You'll know the rate
+of lines you didn't have to write. It doesn't take into account the time you could have wasted jumping from one file 
+back to another one.
+
+| File                    | Number of lines |
+|------------------------:|----------------:|
+| schemas/native-theme.ts |              52 |
+|                         |                 |
+|  native-theme.bridge.ts |              34 |
+|  native-theme.module.ts |              21 |
+|     native-theme.api.ts |              22 |
+|                         |                 |
+|               **Total** |              77 |
+|                 **ROI** |           ~32 % |
+
+## Contributing
+
+Feel free to contribute by creating an issue / submitting a pull-request.

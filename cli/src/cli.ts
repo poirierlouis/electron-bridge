@@ -3,7 +3,7 @@
 import * as yargs from 'yargs';
 import * as fs from "fs";
 import * as path from "path";
-import {Project, SourceFile} from "ts-morph";
+import {CodeBlockWriter, ImportDeclarationStructure, Project, SourceFile, StructureKind} from "ts-morph";
 import {Configuration} from "./configuration";
 import {SchemaParser} from "./schema.parser";
 import {ApiGenerator} from "./api.generator";
@@ -44,6 +44,7 @@ export class ElectronBridgeCli {
     public generate(argv: GenerateArguments): number {
         let schemas: Schema[];
         let files: SchemaFiles[];
+        let declaration: SourceFile;
 
         Logger.info(`<electron-bridge-cli version="1.0.0">`)
               .indent();
@@ -53,7 +54,9 @@ export class ElectronBridgeCli {
 
         schemas = this.parseSchemas();
         files = this.generateSchemas(schemas);
+        declaration = this.generateDeclaration(schemas);
         this.writeSchemas(files);
+        declaration.saveSync();
 
         Logger.unindent().info(`</project>`)
               .unindent().info(`</electron-bridge-cli>`);
@@ -153,6 +156,35 @@ export class ElectronBridgeCli {
         }
         Logger.unindent().info(`</generator>`);
         return files;
+    }
+
+    private generateDeclaration(schemas: Schema[]): SourceFile {
+        const filePath: string = path.join(this.config.output, 'renderer', `renderer.d.ts`);
+        const file: SourceFile = this.project.createSourceFile(filePath, undefined, {overwrite: true});
+        const imports: ImportDeclarationStructure[] = schemas.map(schema => {
+            return {
+                kind: StructureKind.ImportDeclaration,
+                namedImports: [`${schema.className}Api`],
+                moduleSpecifier: `./${schema.fileName}.api`
+            };
+        });
+
+        file.insertText(0, (writer: CodeBlockWriter) => {
+            writer.writeLine(`declare global`);
+            writer.block(() => {
+                writer.writeLine(`interface Window`);
+                writer.block(() => {
+                    schemas.forEach(schema => {
+                        writer.writeLine(`${schema.moduleName}: ${schema.className}Api;`);
+                    });
+                });
+            });
+        });
+        file.addImportDeclarations(imports);
+        file.fixUnusedIdentifiers();
+        file.fixMissingImports();
+        file.organizeImports();
+        return file;
     }
 
     private writeSchemas(schemas: SchemaFiles[]): void {

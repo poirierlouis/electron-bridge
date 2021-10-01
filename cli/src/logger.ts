@@ -131,7 +131,7 @@ export class Logger {
                     result += chalk.white(matchAttribute.groups.empty);
                 } else {
                     result += chalk.white(matchAttribute.groups.name);
-                    result += chalk.green(matchAttribute.groups.value);
+                    result += chalk.greenBright(matchAttribute.groups.value);
                 }
             }
             if (matchTag[3][0] === '/') {
