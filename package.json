@@ -5,9 +5,7 @@
   "author": "Louis Poirier",
   "license": "MIT",
   "private": true,
-  "bugs": {
-    "url": "https://github.com/poirierlouis/electron-bridge/issues"
-  },
+  "bugs": "https://github.com/poirierlouis/electron-bridge/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/poirierlouis/electron-bridge.git"
@@ -21,8 +19,7 @@
     "bridge",
     "context",
     "isolation",
-    "sandbox",
-    "secure"
+    "sandbox"
   ],
   "main": "index.js",
   "types": "index.d.ts",
@@ -39,10 +36,11 @@
   },
   "devDependencies": {
     "electron": ">=9.0.0",
+    "electron-bridge-cli": "file:./cli/electron-bridge-cli-1.0.0.tgz",
     "shx": "^0.3.3",
-    "ts-loader": "^9.2.5",
-    "typescript": "^4.4.2",
-    "webpack-cli": "^4.8.0",
-    "electron-bridge-cli": "file:./cli/electron-bridge-cli-1.0.0.tgz"
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.4.3",
+    "webpack": "^5.56.0",
+    "webpack-cli": "^4.8.0"
   }
 }

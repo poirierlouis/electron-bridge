@@ -19,7 +19,7 @@ This is a monorepo containing two packages:
 ```
 electron-bridge
   |
-  |-- demo/         # a demo to quickly try common modules.
+  |-- demo/         # a demo to quickly test common modules.
   |-- cli/          # electron-bridge-cli package to generate schemas.
   |-- schemas/      # schemas of the Electron's main process modules to generate and expose.
   |-- src/          # source files generated from schemas.
@@ -43,7 +43,7 @@ Here is a brief description of the names used, so that we are on the same page:
 | ./bridge/preload/  | my-something.module.ts | MySomethingModule | Object used in the preload script.      |
 | ./bridge/renderer/ | my-something.api.ts    | MySomethingApi    | Interface used in the renderer process. |
 |                    |                        |                   |                                         |
-| ./bridge/renderer/ | renderer.d.ts          | Window            | Augment Window with bridge's api.       |
+| ./bridge/renderer/ | renderer.ts            | Window            | Augment Window with bridge's api.       |
 
 With this example, you must expect IPC channels to be named `eb.mySomething.<functionName>`.
 
@@ -65,7 +65,7 @@ This table shows you currently implemented bridges:
 | powerMonitor |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
 |        store |                      no | Homemade JSON key/value storage solution. |
 
-You can see usage of each bridge by running the `demo/`.
+You can see usage of each bridge in [demo/](https://github.com/poirierlouis/electron-bridge/tree/master/demo).
 
 
 
@@ -124,7 +124,7 @@ You can also add your own bridge ([see Custom bridge](#custom-bridge)).
 Now that we have registered IPC handlers, we must declare a preload script.
 
 ### 2. Preload script
-Using `context bridge`, it will allows us to expose bridges on the renderer process.
+Using `context bridge`, it will allow us to expose bridges on the renderer process.
 With `PreloadService`, we can expose only what we want to use:
 
 > electron.preload.ts
@@ -141,7 +141,7 @@ Here you add the modules matching the bridges you added in `electron.dev.ts` fil
 You just need to use the `camelCase` name of the bridge, like in Electron documentation (e.g. `nativeTheme`, `powerMonitor`,
  etc.).
 
-You can also add your own module. This is further explained below ([see Create a module](#-2.-create-a-module)).
+You can also add your own module. This is further explained below ([see Create a module](#2-create-a-module)).
 
 You must call `expose()` in order to expose your modules using `context bridge`.
 
@@ -168,7 +168,7 @@ In your renderer process, aka your application. You can now access exposed bridg
 > index.html
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>electron-bridge-test</title>
@@ -203,6 +203,9 @@ $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 
 ## Custom bridge
 You will now learn how to write your own `bridge` which is composed of three files.
+
+You **should** first take a look to understand how things works together.
+But ultimately you'll want to use a `Schema` thanks to `electron-bridge-cli` in [cli/](https://github.com/poirierlouis/electron-bridge/tree/master/cli).
 
 ### 1. Create a bridge
 > Side: main process
@@ -284,10 +287,10 @@ preloadService.add('dialog')
               .expose();
 ```
 
-### 3. Create an api declaration
+### 3. Create an api interface
 > Side: your beloved IDE
 
-Lets write an exported interface for our bridge:
+Let's write an exported interface for our bridge:
 
 > src/bridge/renderer/app.api.ts
 ```typescript
@@ -302,7 +305,7 @@ export interface AppApi {
 
 And augment the Window interface:
 
-> src/bridge/renderer/renderer.d.ts
+> src/bridge/renderer/renderer.ts
 ```typescript
 import {AppApi} from './app.api';
 
@@ -314,7 +317,7 @@ declare global {
 ```
 
 ### 4. Build it
-Use your preferred package to bundle your application and target each Electron's process. You can find an example using
+Use your preferred bundler to bundle your application and target each Electron's process. You can find an example using
 [webpack](https://webpack.js.org/) with this repository configuration file: `./webpack.dev.js`.
 You should edit this configuration to match your project.
 
@@ -355,9 +358,9 @@ should create your own custom module and always check for bad behaviors.
 You can see an example with the `store` module. When `StoreBridge` is created, you give an absolute path (parent) 
 where to store JSON files. You can then create multiple JSON files in this directory using `store.withStore('my/path/db')`.
 Without safety checks, calling `store.withStore('/root/my-store')` would allow **any users** to create a file outside 
-of the given parent `path`.
+the given parent `path`.
 
-In this implementation, attempting to resolve the store's path outside of the given parent path will throw an error.
+In this implementation, attempting to resolve the store's path outside the given parent path will throw an error.
 
 
 
@@ -365,7 +368,7 @@ In this implementation, attempting to resolve the store's path outside of the gi
 A schema allows you to write a single file to describe a bridge between the main process and the renderer process.
 You can then use `electron-bridge-cli` in `cli/` to generate a bridge file, a module file and an api file.
 
-Actually, this package describe `schemas/` and use `electron-bridge-cli` to generate all files under `src/`.
+Actually, this package uses `schemas/` with `electron-bridge-cli` to generate all files under `src/`.
 
 > This is the way.
 
@@ -375,5 +378,5 @@ Actually, this package describe `schemas/` and use `electron-bridge-cli` to gene
 
 Feel free to contribute by creating an issue / submitting a pull-request.
 
-If you wish to propose a new bridge, create an issue to discuss about it, or just submit a PR if you already wrote it.
+If you wish to propose a new bridge, create an issue to discuss it, or just submit a PR if you already wrote it.
 Please remember that one bridge = one schema.
