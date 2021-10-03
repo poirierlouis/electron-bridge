@@ -86,7 +86,7 @@ export class ElectronBridgeCli {
         }).map(schema => <Schema>schema);
 
         if (schemas.length === files.length) {
-            Logger.info(`<result message="Detected all files as schemas (${schemas.length})." />`);
+            Logger.info(`<result message="Detected all files as schemas." />`);
         } else {
             Logger.info();
             Logger.warn(`<result message="Detected only ${schemas.length} valid schemas." />`);
@@ -159,7 +159,7 @@ export class ElectronBridgeCli {
     }
 
     private generateDeclaration(schemas: Schema[]): SourceFile {
-        const filePath: string = path.join(this.config.output, 'renderer', `renderer.d.ts`);
+        const filePath: string = path.join(this.config.output, 'renderer', `renderer.ts`);
         const file: SourceFile = this.project.createSourceFile(filePath, undefined, {overwrite: true});
         const imports: ImportDeclarationStructure[] = schemas.map(schema => {
             return {
@@ -254,13 +254,13 @@ const cli: ElectronBridgeCli = new ElectronBridgeCli();
 
 yargs.scriptName('eb')
      .usage('$0 <cmd> [args]')
-     .command('generate <config>',
-         'Generate electron-bridge modules from schemas.', (yargs) => {
-         yargs.positional('config', {
+     // @ts-ignore
+     .command('generate <config>', 'Generate bridges from schemas.', (args) => {
+         args.positional('config', {
              type: 'string',
              default: 'bridge.config.json',
              describe: 'Path to the configuration file.'
-         })
+         });
      }, cli.generate.bind(cli))
      .help()
      .argv;

@@ -4,6 +4,13 @@
   "description": "Tool used to quickly generate bridges for Electron application using schemas.",
   "author": "Louis Poirier",
   "license": "MIT",
+  "private": true,
+  "bugs": "https://github.com/poirierlouis/electron-bridge/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/poirierlouis/electron-bridge.git",
+    "directory": "cli"
+  },
   "keywords": [
     "electron",
     "bridge",
@@ -27,15 +34,15 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "ts-morph": "^12.0.0",
-    "yargs": "^17.1.1"
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@node-minify/core": "^6.2.0",
     "@node-minify/uglify-es": "^6.2.0",
-    "@types/yargs": "^17.0.2",
+    "@types/yargs": "^17.0.3",
     "glob": "^7.2.0",
     "glob-promise": "^4.2.0",
     "shx": "^0.3.3",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.3"
   }
 }

@@ -41,7 +41,7 @@ You can provide a configuration file to `electron-bridge-cli` with the following
 By reusing your project `tsconfig.json` file, `electron-bridge-cli` will generate files with the same configuration and 
 therefore provides the same indentation, new line kind, etc. as your project.
 
-When generating files from schemas, `electron-bridge` interfaces are imported for you:
+When generating files from schemas, `electron-bridge` is imported for you:
 - when working on `electron-bridge`, you need to set `"main": true` to import modules relative to the package (e.g. `import {Bridge} from './bridge.ts'`).
 - when working on any other project, you need to set `"main": false` to import modules from the package (e.g. `import {Bridge} from 'electron-bridge/main'`).
 
@@ -52,14 +52,14 @@ ${output}
   |
   |-- main/           # contains bridge classes (*.bridge.ts)
   |-- preload/        # contains module classes (*.module.ts)
-  |-- renderer/       # contains api interfaces (*.api.ts) and augmented Window (renderer.d.ts)
+  |-- renderer/       # contains api interfaces (*.api.ts) and augmented Window (renderer.ts)
 ```
 
 ## Schema
 A schema is a single file you can write containing main process features to be exposed in the renderer process.
-It uses a valid Typescript syntax to generate a bridge file, a module file and an api declaration file.
+It uses a valid Typescript syntax to generate a bridge file, a module file and an api interface file.
 
-Lets see what it looks like with this example:
+Let's see what it looks like with this example:
 
 > schemas/native-theme.ts
 ```typescript
@@ -121,7 +121,7 @@ You can see that the code is pretty simple to write and understand.
 You can look at the generated code that `eb generate ./bridge.config.json` command would produce, 
 [here](#output).
 
-Lets dive into the specifics of this format.
+Let's dive into the specifics of this format.
 
 #### 1. Schema decorator and class declaration
 > schemas/native-theme.ts
@@ -140,7 +140,7 @@ You **must** indicate a value for the parameter `readonly`:
 - `true` means this bridge behaves without using any write operations on the user's device.
 - `false` means this bridge behaves with the use of write operations on the user's device.
 
-> `readonly` is currently not reused but still required as a safety information.
+> `readonly` is currently not reused but still required as safety information.
 > It shall be implemented in the future to quickly filter safe bridges to register.
 
 You **must** export the class along with the decorator in order to be parsed by the tool.
@@ -169,14 +169,15 @@ If you provide documentation for your class, it will be reused in the api interf
 ```typescript
 // ...
 export class NativeTheme {
-  
-  // ...
 
-  constructor(private win: BrowserWindow) {
-    
-  }
+    // ...
 
-  // ...
+    constructor(private win: BrowserWindow) {
+
+    }
+
+    // ...
+}
 ```
 
 You can declare it or not, it will be reused as-this in the bridge file.
@@ -191,28 +192,31 @@ An example might be to pass your BrowserWindow instance in order to send events 
 ```typescript
 // ...
 export class NativeTheme {
-    
-  // ...
 
-  public register(): void {
-    nativeTheme.on('updated', this.emitUpdated.bind(this));
-  }
+    // ...
 
-  public release(): void {
-    nativeTheme.off('updated', this.emitUpdated.bind(this));
-  }
+    public register(): void {
+        nativeTheme.on('updated', this.emitUpdated.bind(this));
+    }
 
-  // ...
+    public release(): void {
+        nativeTheme.off('updated', this.emitUpdated.bind(this));
+    }
+
+    // ...
+}
 ```
 
-In the main process, your bridge instance will be registered when Electron app initialize, which is after you 
-create a BrowserWindow. You *can* override `register()` to initialize stuff, add event listeners, etc.
+In the main process, a bridge **shall** be initialized after a BrowserWindow is instantiated.
+It **shall** then be released after that same BrowserWindow [closed](https://www.electronjs.org/docs/latest/api/browser-window#event-closed).
 
-When your Electron window [closed](https://www.electronjs.org/docs/latest/api/browser-window#event-closed), you *can* 
-override `release()` to dispose off stuff, remove event listeners, etc.
+`BridgeService` will call `register()` to initialize your bridge and call `release()` to release it.
 
-NB: bridge classes contains generated IPC handlers in `register()` and remove handlers in `release()`. When you override
-these functions, your code will be appended at the beginning of the function, and the generated code at the end.
+You can override these two functions to listen to events, open / close a file, allocate / deallocate memory, etc.
+
+> Note: when generated `register()` and `release()` functions will contain calls to add and remove IPC handlers.
+> If you override one of these, be aware that your code will be appended at the beginning of the function, while 
+> generated code will be appended after.
 
 #### 5. Public functions
 > schemas/native-theme.ts
