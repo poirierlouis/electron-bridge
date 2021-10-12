@@ -7,3 +7,4 @@ cli/test/src/
 src/index.js
 demo/src/electron.dev.js
 demo/src/electron.preload.js
+cli/coverage/
