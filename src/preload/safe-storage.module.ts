@@ -1,18 +1,18 @@
 import { ipcRenderer } from "electron";
 import { BridgeModule } from "./bridge.module";
 
-export const PowerSaveBlockerModule: BridgeModule = {
-    name: 'powerSaveBlocker',
+export const SafeStorageModule: BridgeModule = {
+    name: 'safeStorage',
     readonly: true,
     api: {
         isEncryptionAvailable: async () => {
-            return await ipcRenderer.invoke('eb.powerSaveBlocker.isEncryptionAvailable');
+            return await ipcRenderer.invoke('eb.safeStorage.isEncryptionAvailable');
         },
         encryptString: async (plainText: string) => {
-            return await ipcRenderer.invoke('eb.powerSaveBlocker.encryptString', plainText);
+            return await ipcRenderer.invoke('eb.safeStorage.encryptString', plainText);
         },
         decryptString: async (encrypted: ArrayBuffer) => {
-            return await ipcRenderer.invoke('eb.powerSaveBlocker.decryptString', encrypted);
+            return await ipcRenderer.invoke('eb.safeStorage.decryptString', encrypted);
         }
     }
 };

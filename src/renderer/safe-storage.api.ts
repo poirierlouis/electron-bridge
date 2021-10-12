@@ -2,7 +2,7 @@
 /**
  * Allows access to simple encryption and decryption of strings for storage on the local machine.
  */
-export interface PowerSaveBlockerApi {
+export interface SafeStorageApi {
     /**
      * On Linux, returns true if the secret key is available. On MacOS, returns true if Keychain is available.
      * On Windows, returns true with no other preconditions.

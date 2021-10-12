@@ -5,7 +5,7 @@ import {Schema} from "electron-bridge-cli";
  * Allows access to simple encryption and decryption of strings for storage on the local machine.
  */
 @Schema(true)
-export class PowerSaveBlocker {
+export class SafeStorage {
 
     /**
      * On Linux, returns true if the secret key is available. On MacOS, returns true if Keychain is available.

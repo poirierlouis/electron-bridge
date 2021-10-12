@@ -55,15 +55,17 @@ contains homemade bridges for the benefit of all developers.
 ## Bridges
 This table shows you currently implemented bridges:
 
-|       Bridge | Native Electron module? | Description      |
-|-------------:|:-----------------------:|------------------|
-|  autoUpdater |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater) |
-|       dialog |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog) |
-|   fileSystem |                      no | Homemade wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
-|  nativeTheme |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme) |
-|         path |                      no | Homemade wrapper for Node.js [path](https://nodejs.org/api/path.html) module. |
-| powerMonitor |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
-|        store |                      no | Homemade JSON key/value storage solution. |
+|           Bridge | Native Electron module? | Description      |
+|-----------------:|:-----------------------:|------------------|
+|      autoUpdater |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater) |
+|           dialog |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog) |
+|       fileSystem |                      no | Homemade wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
+|      nativeTheme |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme) |
+|             path |                      no | Homemade wrapper for Node.js [path](https://nodejs.org/api/path.html) module. |
+|     powerMonitor |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
+| powerSaveBlocker |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-save-blocker) |
+|      safeStorage |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/safe-storage) |
+|            store |                      no | Homemade JSON key/value storage solution. |
 
 You can see usage of each bridge in [demo/](https://github.com/poirierlouis/electron-bridge/tree/master/demo).
 
@@ -355,7 +357,7 @@ you expose to the renderer process ([cf Security considerations](https://www.ele
 You can quickly implement a logic in your application using the `fileSystem` module and test it. But at the end, you 
 should create your own custom module and always check for bad behaviors.
 
-You can see an example with the `store` module. When `StoreBridge` is created, you give an absolute path (parent) 
+You can see an example with the `store` bridge. When `StoreBridge` is created, you give an absolute path (parent) 
 where to store JSON files. You can then create multiple JSON files in this directory using `store.withStore('my/path/db')`.
 Without safety checks, calling `store.withStore('/root/my-store')` would allow **any users** to create a file outside 
 the given parent `path`.
