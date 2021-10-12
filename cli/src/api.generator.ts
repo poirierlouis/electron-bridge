@@ -53,7 +53,7 @@ export class ApiGenerator {
     }
 
     private generateMethods(schema: Schema): MethodSignatureStructure[] {
-        return [...schema.publicMethods, ...schema.publicEvents].map(method => {
+        return [...schema.publicMethods, ...schema.eventListeners].map(method => {
             return <MethodSignatureStructure>{
                 kind: StructureKind.MethodSignature,
                 name: method.name,

@@ -68,20 +68,7 @@ export class ElectronBridgeCli {
 
         Logger.info(`<parser files="${files.length}">`);
         Logger.indent();
-        const schemas: Schema[] = files.map(file => {
-            try {
-                const schema: Schema = this.parser.parse(file);
-                if (this.config.verbose) {
-                    const fileName: string = path.relative(this.config.schemas, file.getFilePath());
-
-                    Logger.log(`<parsed file="${fileName}" lines="${file.getEndLineNumber()}" />`);
-                }
-                return schema;
-            } catch (error) {
-                this.logError(error, file);
-                return null;
-            }
-        }).filter(schema => {
+        const schemas: Schema[] = files.map(this.parseSchema.bind(this)).filter(schema => {
             return schema !== null;
         }).map(schema => <Schema>schema);
 
@@ -93,6 +80,22 @@ export class ElectronBridgeCli {
         }
         Logger.unindent().info(`</parser>`);
         return schemas;
+    }
+
+    private parseSchema(file: SourceFile): Schema | null {
+        try {
+            const schema: Schema = this.parser.parse(file);
+
+            if (this.config.verbose) {
+                const fileName: string = path.relative(this.config.schemas, file.getFilePath());
+
+                Logger.log(`<parsed file="${fileName}" lines="${file.getEndLineNumber()}" />`);
+            }
+            return schema;
+        } catch (error) {
+            this.logError(error, file);
+            return null;
+        }
     }
 
     private generateSchemas(schemas: Schema[]): SchemaFiles[] {

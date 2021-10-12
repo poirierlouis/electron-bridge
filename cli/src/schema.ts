@@ -26,6 +26,7 @@ export interface Schema {
     jsDocs?: JSDoc[];
     privateInterfaces?: InterfaceDeclarationStructure[];
     privateClasses?: ClassDeclarationStructure[];
+    privateTypes?: TypeAliasDeclarationStructure[];
     publicClasses?: ClassDeclarationStructure[];
     publicInterfaces?: InterfaceDeclarationStructure[];
     publicTypes?: TypeAliasDeclarationStructure[];
@@ -33,7 +34,7 @@ export interface Schema {
     registerMethod?: MethodDeclarationStructure | undefined;
     releaseMethod?: MethodDeclarationStructure | undefined;
     publicMethods?: MethodDeclarationStructure[];
-    publicEvents?: MethodDeclarationStructure[];
+    eventListeners?: MethodDeclarationStructure[];
     privateMethods?: MethodDeclarationStructure[];
 
 }

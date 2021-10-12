@@ -29,6 +29,7 @@ export class BridgeGenerator {
         file.addImportDeclarations(this.generateImports(schema));
         file.addInterfaces(schema.privateInterfaces);
         file.addClasses(schema.privateClasses);
+        file.addTypeAliases(schema.privateTypes);
         file.addClass({
             kind: StructureKind.Class,
             isExported: true,
