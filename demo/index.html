@@ -5,7 +5,7 @@
     <!-- Do not use in production! -->
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval';">
 
-    <title>electron-bridge</title>
+    <title>@lpfreelance/electron-bridge</title>
 
     <style>
         html, body {
@@ -174,99 +174,5 @@
 </section>
 <script>global = globalThis;</script>
 <script src="index.js"></script>
-<!--
-    function loadStore() {
-        const $storeTree = document.querySelector('#store #store-tree');
-
-        store.withStore(currentStore).then(() => {
-            return store.get('peoples');
-        }).then(peoples => {
-            if (!peoples) {
-                return;
-            }
-            $storeTree.innerHTML = beautify(peoples);
-        });
-    }
-
-    function onStoreChanged() {
-        const $storeTree = document.querySelector('#store #store-tree');
-        const $storePath = document.querySelector('#store #storePath');
-        const $storePathInput = document.querySelector('#store #store-path');
-
-        $storePath.innerHTML = `'${currentStore}'`;
-        store.withStore($storePathInput.value).then(() => {
-            currentStore = $storePathInput.value;
-            $storeTree.innerHTML = '';
-        }).catch((error) => {
-            alert(error)
-        });
-    }
-
-    function onStoreSet() {
-        const $storeTree = document.querySelector('#store #store-tree');
-        const $storeKey = document.querySelector('#store #store-key');
-        const $storeValue = document.querySelector('#store #store-value');
-
-        const key = $storeKey.value;
-        const value = JSON.parse($storeValue.value);
-
-        store.set(key, value).then(() => {
-            return store.get(key);
-        }).then(value => {
-            console.log(value);
-            $storeTree.innerHTML = beautify(value);
-        }).catch(error => {
-            console.error(error);
-        });
-    }
-
-    function beautify(data) {
-        return JSON.stringify(data);
-    }
-
-    // #endregion
-
-
-
-    // #region Tab logic
-
-    function loadTabsHeader() {
-        const $tabButtons = document.querySelectorAll('.tabs button');
-        const $tabs = document.querySelectorAll(`.tab:not(#${currentTab})`);
-
-        $tabButtons.forEach($button => {
-            const tabId = $button.getAttribute('data-tab');
-
-            $button.addEventListener('click', () => {
-                openTab(tabId);
-            });
-        });
-        $tabs.forEach($tab => {
-            $tab.classList.add('hide');
-        });
-    }
-
-    function openTab(tabId) {
-        const $nextTab = document.querySelector(`#${tabId}.tab`);
-        const $currentTab = document.querySelector(`#${currentTab}.tab`);
-
-        if (!$nextTab) {
-            return;
-        }
-        $currentTab.classList.add('hide');
-        $nextTab.classList.remove('hide');
-        currentTab = tabId;
-    }
-
-    // #endregion
-
-
-
-    // #region Start
-
-    load();
-
-    // #endregion
-</script>-->
 </body>
 </html>

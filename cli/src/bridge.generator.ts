@@ -60,7 +60,7 @@ export class BridgeGenerator {
         imports.push({
             kind: StructureKind.ImportDeclaration,
             namedImports: ['Bridge'],
-            moduleSpecifier: (this.config.main) ? './bridge' : 'electron-bridge/main'
+            moduleSpecifier: (this.config.main) ? './bridge' : '@lpfreelance/electron-bridge/main'
         });
         imports.push({
             kind: StructureKind.ImportDeclaration,

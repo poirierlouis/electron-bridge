@@ -1,5 +1,5 @@
 {
-  "name": "electron-bridge",
+  "name": "@lpfreelance/electron-bridge",
   "version": "1.0.0",
   "description": "Safely expose main process modules of Electron to renderer process through IPC.",
   "author": "Louis Poirier",
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "electron": ">=9.0.0",
-    "electron-bridge-cli": "file:./cli/electron-bridge-cli-1.0.0.tgz",
+    "@lpfreelance/electron-bridge-cli": "file:./cli/lpfreelance-electron-bridge-cli-1.0.0.tgz",
     "shx": "^0.3.3",
     "ts-loader": "^9.2.6",
     "typescript": "^4.4.3",

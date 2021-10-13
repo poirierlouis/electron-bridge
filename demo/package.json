@@ -1,5 +1,5 @@
 {
-  "name": "electron-bridge-demo",
+  "name": "@lpfreelance/electron-bridge-demo",
   "version": "1.0.0",
   "description": "",
   "license": "MIT",
@@ -12,7 +12,7 @@
     "electron": "tsc electron.dev.ts && electron electron.dev.js"
   },
   "dependencies": {
-    "electron-bridge": "file:../electron-bridge-1.0.0.tgz"
+    "@lpfreelance/electron-bridge": "file:../lpfreelance-electron-bridge-1.0.0.tgz"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^9.0.1",

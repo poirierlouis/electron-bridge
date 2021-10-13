@@ -1,4 +1,4 @@
-import {PreloadService} from "electron-bridge/preload";
+import {PreloadService} from "@lpfreelance/electron-bridge/preload";
 
 const preload = new PreloadService();
 

@@ -49,7 +49,7 @@ export class ModuleGenerator {
         imports.push({
             kind: StructureKind.ImportDeclaration,
             namedImports: ['BridgeModule'],
-            moduleSpecifier: (this.config.main) ? './bridge.module' : 'electron-bridge/preload'
+            moduleSpecifier: (this.config.main) ? './bridge.module' : '@lpfreelance/electron-bridge/preload'
         });
         schema.publicInterfaces
               .filter(is => is.isExported)

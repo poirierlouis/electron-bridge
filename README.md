@@ -1,4 +1,5 @@
 # electron-bridge
+[![npm version](https://img.shields.io/npm/v/@lpfreelance/electron-bridge)](https://www.npmjs.com/package/@lpfreelance/electron-bridge)
 
 This library provides common main process modules (bridges) to be used from a renderer process in your Electron 
 application [(cf Process Model)](https://www.electronjs.org/docs/latest/tutorial/process-model).
@@ -48,24 +49,29 @@ Here is a brief description of the names used, so that we are on the same page:
 With this example, you must expect IPC channels to be named `eb.mySomething.<functionName>`.
 
 Finally `common bridges` means exposed Electron's main features (e.g. `nativeTheme`, `powerMonitor`, etc.). It also 
-contains homemade bridges for the benefit of all developers.
+contains homebrew bridges for the benefit of all developers.
 
 
 
 ## Bridges
 This table shows you currently implemented bridges:
 
-|           Bridge | Native Electron module? | Description      |
-|-----------------:|:-----------------------:|------------------|
-|      autoUpdater |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater) |
-|           dialog |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog) |
-|       fileSystem |                      no | Homemade wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
-|      nativeTheme |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme) |
-|             path |                      no | Homemade wrapper for Node.js [path](https://nodejs.org/api/path.html) module. |
-|     powerMonitor |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
-| powerSaveBlocker |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-save-blocker) |
-|      safeStorage |                     yes | [cf Documentation](https://www.electronjs.org/docs/latest/api/safe-storage) |
-|            store |                      no | Homemade JSON key/value storage solution. |
+### 1. Electron
+|           Bridge | Description      |
+|-----------------:|------------------|
+|      autoUpdater | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater) |
+|           dialog | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog) |
+|      nativeTheme | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme) |
+|     powerMonitor | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
+| powerSaveBlocker | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-save-blocker) |
+|      safeStorage | [cf Documentation](https://www.electronjs.org/docs/latest/api/safe-storage) |
+
+### 2. Homebrew
+|           Bridge | Description      |
+|-----------------:|------------------|
+|       fileSystem | Very simple wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
+|             path | Wrapper for Node.js [path](https://nodejs.org/api/path.html) module. |
+|            store | JSON key/value storage solution. |
 
 You can see usage of each bridge in [demo/](https://github.com/poirierlouis/electron-bridge/tree/master/demo).
 
@@ -83,7 +89,7 @@ In your electron entry-point:
 > electron.dev.ts
 ```typescript
 import {app, BrowserWindow} from 'electron';
-import {BridgeService, DialogBridge} from 'electron-bridge/main';
+import {BridgeService, DialogBridge} from '@lpfreelance/electron-bridge/main';
 
 let win: BrowserWindow;
 let bridgeService: BridgeService;
@@ -131,7 +137,7 @@ With `PreloadService`, we can expose only what we want to use:
 
 > electron.preload.ts
 ```typescript
-import {PreloadService} from 'electron-bridge/preload';
+import {PreloadService} from '@lpfreelance/electron-bridge/preload';
 
 const preloadService = new PreloadService();
 
@@ -207,7 +213,7 @@ $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 You will now learn how to write your own `bridge` which is composed of three files.
 
 You **should** first take a look to understand how things works together.
-But ultimately you'll want to use a `Schema` thanks to `electron-bridge-cli` in [cli/](https://github.com/poirierlouis/electron-bridge/tree/master/cli).
+But ultimately you'll want to use a `Schema` thanks to [electron-bridge-cli](https://github.com/poirierlouis/electron-bridge/tree/master/cli) in `cli/`.
 
 ### 1. Create a bridge
 > Side: main process
@@ -217,7 +223,7 @@ You must implement a Bridge interface in order to register it in the main proces
 > src/bridge/main/app.bridge.ts
 ```typescript
 import {App, ipcMain} from 'electron';
-import {Bridge} from 'electron-bridge/main';
+import {Bridge} from '@lpfreelance/electron-bridge/main';
 
 export class AppBridge implements Bridge {
 
@@ -256,7 +262,7 @@ Then, you must write your module using BridgeModule interface:
 > src/bridge/preload/app.module.ts
 ```typescript
 import {ipcRenderer} from 'electron';
-import {BridgeModule} from 'electron-bridge/preload';
+import {BridgeModule} from '@lpfreelance/electron-bridge/preload';
 
 export const AppModule: BridgeModule = {
     name: 'app',
@@ -279,7 +285,7 @@ You can now import and add your custom module in the preload script:
 
 > src/electron.preload.ts
 ```typescript
-import {PreloadService} from 'electron-bridge/preload';
+import {PreloadService} from '@lpfreelance/electron-bridge/preload';
 import {AppModule} from './bridge/module/app.module.ts';
 
 const preloadService = new PreloadService();
@@ -352,7 +358,7 @@ We can now use our custom module:
 
 ## Security
 This library provides a pattern to quickly access main process features. You are still responsible regarding features 
-you expose to the renderer process ([cf Security considerations](https://www.electronjs.org/docs/latest/tutorial/context-isolation#security-considerations)).
+you expose to the renderer process ([cf Context Isolation](https://www.electronjs.org/docs/latest/tutorial/context-isolation)).
 
 You can quickly implement a logic in your application using the `fileSystem` module and test it. But at the end, you 
 should create your own custom module and always check for bad behaviors.
@@ -370,7 +376,8 @@ In this implementation, attempting to resolve the store's path outside the given
 A schema allows you to write a single file to describe a bridge between the main process and the renderer process.
 You can then use `electron-bridge-cli` in `cli/` to generate a bridge file, a module file and an api file.
 
-Actually, this package uses `schemas/` with `electron-bridge-cli` to generate all files under `src/`.
+Actually, this package uses `schemas/` with [electron-bridge-cli](https://github.com/poirierlouis/electron-bridge/tree/master/cli)
+to generate all files under `src/`.
 
 > This is the way.
 

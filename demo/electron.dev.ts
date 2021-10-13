@@ -1,6 +1,6 @@
 import {app, BrowserWindow} from 'electron';
 import * as path from 'path';
-import {BridgeService, DialogBridge, NativeThemeBridge, PowerMonitorBridge, StoreBridge} from "electron-bridge/main";
+import {BridgeService, DialogBridge, NativeThemeBridge, PowerMonitorBridge, StoreBridge} from "@lpfreelance/electron-bridge/main";
 
 app.enableSandbox();
 

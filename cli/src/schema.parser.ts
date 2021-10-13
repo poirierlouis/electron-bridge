@@ -50,7 +50,7 @@ export class SchemaParser {
         schema.cd.rename(`${schema.className}Bridge`);
 
         schema.imports = file.getImportDeclarations().filter(id => {
-            return id.getModuleSpecifierValue() !== 'electron-bridge-cli';
+            return id.getModuleSpecifierValue() !== '@lpfreelance/electron-bridge-cli';
         }).map(id => {
             return id.getStructure();
         });

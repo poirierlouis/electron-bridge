@@ -1,4 +1,4 @@
-import "electron-bridge/renderer";
+import "@lpfreelance/electron-bridge/renderer";
 import {AbstractTab} from "./abstract.tab";
 
 export class NativeThemeTab extends AbstractTab {

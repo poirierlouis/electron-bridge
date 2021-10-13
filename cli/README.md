@@ -1,13 +1,18 @@
 # electron-bridge-cli
+[![npm version](https://img.shields.io/npm/v/@lpfreelance/electron-bridge-cli)](https://www.npmjs.com/package/@lpfreelance/electron-bridge-cli)
 
 `electron-bridge-cli` is a tool to quickly create bridges for [electron-bridge](https://github.com/poirierlouis/electron-bridge).
 This is used internally to generate source files in `electron-bridge`.
 You can use this command line interface to create your own custom modules.
 
+
+
 ## Install
 ```shell script
-$ npm install --save-dev electron-bridge-cli
+$ npm install --save-dev @lpfreelance/electron-bridge-cli
 ```
+
+
 
 ## Usage
 ```shell script
@@ -15,6 +20,8 @@ $ eb generate ./bridge.config.json
 ```
 
 Execute program from current working directory using given configuration file.
+
+
 
 ## Configuration
 You can provide a configuration file to `electron-bridge-cli` with the following object:
@@ -45,6 +52,8 @@ When generating files from schemas, `electron-bridge` is imported for you:
 - when working on `electron-bridge`, you need to set `"main": true` to import modules relative to the package (e.g. `import {Bridge} from './bridge.ts'`).
 - when working on any other project, you need to set `"main": false` to import modules from the package (e.g. `import {Bridge} from 'electron-bridge/main'`).
 
+
+
 ## Output files
 Each schema will be generated in the `output` path using this structure:
 ```
@@ -55,6 +64,8 @@ ${output}
   |-- renderer/       # contains api interfaces (*.api.ts) and augmented Window (renderer.ts)
 ```
 
+
+
 ## Schema
 A schema is a single file you can write containing main process features to be exposed in the renderer process.
 It uses a valid Typescript syntax to generate a bridge file, a module file and an api interface file.
@@ -64,7 +75,7 @@ Let's see what it looks like with this example:
 > schemas/native-theme.ts
 ```typescript
 import {BrowserWindow, nativeTheme} from 'electron';
-import {Schema, EventListener} from 'electron-bridge-cli';
+import {Schema, EventListener} from '@lpfreelance/electron-bridge-cli';
 
 /**
  * Emitted when something in the underlying NativeTheme has changed.
@@ -126,7 +137,7 @@ Let's dive into the specifics of this format.
 #### 1. Schema decorator and class declaration
 > schemas/native-theme.ts
 ```typescript
-import {Schema} from 'electron-bridge-cli';
+import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 @Schema(false)
 export class NativeTheme {
@@ -331,6 +342,8 @@ export interface ThemeUpdatedEvent {
 You can write exported classes and interfaces. They will only be included in the api interface file.
 If you use them in the bridge class, they will be imported from the api interface module.
 
+
+
 ## Output
 For one schema, three files are generated: a bridge class, a module interface and an api interface.
 With our current schema, `electron-bridge-cli` would create the following files after executing 
@@ -339,7 +352,7 @@ With our current schema, `electron-bridge-cli` would create the following files 
 > src/bridge/main/native-theme.bridge.ts
 ```typescript
 import {BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeTheme} from 'electron';
-import {Bridge} from 'electron-bridge-cli/main';
+import {Bridge} from '@lpfreelance/electron-bridge-cli/main';
 
 export class NativeThemeBridge implements Bridge {
 
@@ -377,7 +390,7 @@ export class NativeThemeBridge implements Bridge {
 > src/bridge/preload/native-theme.module.ts
 ```typescript
 import {ipcRenderer, IpcRendererEvent} from 'electron';
-import {BridgeModule} from 'electron-bridge-cli/preload';
+import {BridgeModule} from '@lpfreelance/electron-bridge-cli/preload';
 import {ThemeUpdatedEvent} from "../renderer/native-theme.api";
 
 export const NativeThemeModule: BridgeModule = {
@@ -436,6 +449,8 @@ declare global {
 }
 ```
 
+
+
 ## ROI
 > Why not?
 
@@ -453,6 +468,10 @@ back to another one.
 |                         |                 |
 |               **Total** |              77 |
 |                 **ROI** |           ~32 % |
+
+> I have spoken.
+
+
 
 ## Contributing
 

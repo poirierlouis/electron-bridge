@@ -1,5 +1,5 @@
 import {AbstractTab} from "./abstract.tab";
-import "electron-bridge/renderer";
+import "@lpfreelance/electron-bridge/renderer";
 
 export class DialogTab extends AbstractTab {
 
