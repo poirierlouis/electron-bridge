@@ -11,6 +11,8 @@ function main() {
     delete packageJson.scripts;
     delete packageJson.devDependencies;
     fs.writeFileSync('dist/package.json', JSON.stringify(packageJson), {encoding: 'utf8', flag: 'w'});
+    fs.copyFileSync('README.md', 'dist/README.md');
+    fs.copyFileSync('LICENSE', 'dist/LICENSE');
 }
 
 main();
