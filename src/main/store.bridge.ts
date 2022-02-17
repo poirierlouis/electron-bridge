@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { ipcMain, IpcMainInvokeEvent, safeStorage } from "electron";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { Bridge } from "./bridge";
@@ -12,6 +12,7 @@ export class StoreBridge implements Bridge {
     private readonly rootPath: string;
     private path: string;
     private store: any;
+    private isEncrypted: boolean;
 
     /**
      * Create a StoreBridge with a path to restrict stores' location.
@@ -20,25 +21,32 @@ export class StoreBridge implements Bridge {
      */
     constructor(rootPath: string) {
         this.rootPath = rootPath;
+        this.isEncrypted = false;
         this.path = path.join(this.rootPath, 'store.json');
         this.store = {};
     }
 
     public register(): void {
-        ipcMain.handle('eb.store.withStore', async (_: IpcMainInvokeEvent, storePath: string) => {
+        ipcMain.handle('eb.store.withStore', async (_: IpcMainInvokeEvent, storePath: string, isEncrypted: boolean) => {
             if (!storePath || storePath.length === 0) {
                 storePath = 'store';
+            }
+            if (isEncrypted != true) {
+                isEncrypted = false;
+            } else {
+                isEncrypted = safeStorage.isEncryptionAvailable();
             }
             if (storePath.indexOf('\0') !== -1) {
                 throw new Error(`<electron-bridge side="main" module="store" error="Protecting against Poison Null bytes!" />`);
             }
-            this.path = path.resolve(this.rootPath, `${storePath.trim().toLowerCase()}.json`);
-            if (this.path.indexOf(this.rootPath) !== 0) {
-                this.path = path.join(this.rootPath, 'store.json');
+            storePath = path.resolve(this.rootPath, `${storePath.trim().toLowerCase()}.json`);
+            if (storePath.indexOf(this.rootPath) !== 0) {
                 throw new Error(`<electron-bridge side="main" module="store" error="Preventing directory traversal!" />`);
             }
+            this.path = storePath;
+            this.isEncrypted = isEncrypted;
             try {
-                        const data: string = await fs.readFile(this.path, {encoding: 'utf8', flag: 'r'});
+                        const data: string = await this.load();
 
                         this.store = JSON.parse(data);
                     } catch (error) {
@@ -112,6 +120,23 @@ export class StoreBridge implements Bridge {
     }
 
     private update(): Promise<void> {
-        return fs.writeFile(this.path, JSON.stringify(this.store), {encoding: 'utf8', flag: 'w'});
+        let data: string = JSON.stringify(this.store);
+        if (this.isEncrypted) {
+                    const buffer: Buffer = safeStorage.encryptString(data);
+
+                    return fs.writeFile(this.path, buffer, {flag: 'w'});
+                }
+
+        return fs.writeFile(this.path, data, {encoding: 'utf8', flag: 'w'});
+    }
+
+    private async load(): Promise<string> {
+        if (this.isEncrypted) {
+                    const buffer: Buffer = await fs.readFile(this.path, {flag: 'r'});
+
+                    return safeStorage.decryptString(buffer);
+                }
+
+        return fs.readFile(this.path, {encoding: 'utf8', flag: 'r'});
     }
 }

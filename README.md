@@ -70,7 +70,7 @@ This table shows you currently implemented bridges:
 |-----------:|---------------------------------------------------------------------------------------|
 | fileSystem | Very simple wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
 |       path | Wrapper for Node.js [path](https://nodejs.org/api/path.html) module.                  |
-|      store | JSON key/value storage solution.                                                      |
+|      store | JSON key/value storage solution using `safeStorage` to encrypt / decrypt data.        |
 
 You can see usage of each bridge in [demo/](https://github.com/poirierlouis/electron-bridge/tree/master/demo).
 

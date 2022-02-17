@@ -5,8 +5,8 @@ export const StoreModule: BridgeModule = {
     name: 'store',
     readonly: true,
     api: {
-        withStore: async (storePath: string) => {
-            return await ipcRenderer.invoke('eb.store.withStore', storePath);
+        withStore: async (storePath: string, isEncrypted: boolean) => {
+            return await ipcRenderer.invoke('eb.store.withStore', storePath, isEncrypted);
         },
         set: async (key: string, value: any) => {
             return await ipcRenderer.invoke('eb.store.set', key, value);

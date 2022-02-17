@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import {Schema} from 'electron-bridge-cli';
+import {safeStorage} from 'electron';
+import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 interface StoreItem {
 
@@ -11,15 +12,23 @@ interface StoreItem {
 
 /**
  * Store data in user's application directory with JSON format (JSON.stringify / JSON.parse).
+ * You can use OS solution to encrypt / decrypt data per store if available on device.
  * Important: you must only interact with one store at time!
  *
- * You can use chained dot notation with `set`, `has`, `get`, and `delete` operations like in examples bellow:
- * `store.set('peoples', {});`
- * `store.set('peoples.42', {id: 42, name: Grogu, age: NaN, force: Infinite});`
- * `store.set('peoples.42.age', 50);`
- * `console.assert(await store.has('peoples.42') === true);`
- * `const age: number = await store.get('peoples.42.age');`
+ * You can use chained dot notation with `set`, `has`, `get`, and `delete` operations like in example bellow:
+ * ```javascript
+ * () async {
+ *     await store.set('people', {});
+ *     await store.set('people.42', {id: 42, name: Grogu, age: NaN, force: Infinite});
+ *     await store.set('people.42.age', 50);
  *
+ *     const someone = await store.has('people.42');
+ *     console.assert(someone === true);
+ *
+ *     const age: number = await store.get('people.42.age');
+ *     console.assert(age === 50);
+ * }
+ * ```
  */
 @Schema(true)
 export class Store {
@@ -28,6 +37,7 @@ export class Store {
 
     private path: string;
     private store: any;
+    private isEncrypted: boolean;
 
     /**
      * Create a StoreBridge with a path to restrict stores' location.
@@ -36,6 +46,7 @@ export class Store {
      */
     constructor(rootPath: string) {
         this.rootPath = rootPath;
+        this.isEncrypted = false;
         this.path = path.join(this.rootPath, 'store.json');
         this.store = {};
     }
@@ -44,21 +55,29 @@ export class Store {
      * Open a store to interact with; e.g. `relative/path/to/my-store`.
      *
      * @param storePath of the file to create / open; default 'store'.
+     * @param isEncrypted true will encrypt / decrypt data using OS solution if available, false to store plain data.
+     * Default false. If *isEncrypted* is true and feature is not available on device, will silently fall back to false.
      */
-    public async withStore(storePath?: string): Promise<void> {
+    public async withStore(storePath?: string, isEncrypted?: boolean): Promise<void> {
         if (!storePath || storePath.length === 0) {
             storePath = 'store';
+        }
+        if (isEncrypted != true) {
+            isEncrypted = false;
+        } else {
+            isEncrypted = safeStorage.isEncryptionAvailable();
         }
         if (storePath.indexOf('\0') !== -1) {
             throw new Error(`<electron-bridge side="main" module="store" error="Protecting against Poison Null bytes!" />`);
         }
-        this.path = path.resolve(this.rootPath, `${storePath.trim().toLowerCase()}.json`);
-        if (this.path.indexOf(this.rootPath) !== 0) {
-            this.path = path.join(this.rootPath, 'store.json');
+        storePath = path.resolve(this.rootPath, `${storePath.trim().toLowerCase()}.json`);
+        if (storePath.indexOf(this.rootPath) !== 0) {
             throw new Error(`<electron-bridge side="main" module="store" error="Preventing directory traversal!" />`);
         }
+        this.path = storePath;
+        this.isEncrypted = isEncrypted;
         try {
-            const data: string = await fs.readFile(this.path, {encoding: 'utf8', flag: 'r'});
+            const data: string = await this.load();
 
             this.store = JSON.parse(data);
         } catch (error) {
@@ -154,7 +173,23 @@ export class Store {
     }
 
     private update(): Promise<void> {
-        return fs.writeFile(this.path, JSON.stringify(this.store), {encoding: 'utf8', flag: 'w'});
+        let data: string = JSON.stringify(this.store);
+
+        if (this.isEncrypted) {
+            const buffer: Buffer = safeStorage.encryptString(data);
+
+            return fs.writeFile(this.path, buffer, {flag: 'w'});
+        }
+        return fs.writeFile(this.path, data, {encoding: 'utf8', flag: 'w'});
+    }
+
+    private async load(): Promise<string> {
+        if (this.isEncrypted) {
+            const buffer: Buffer = await fs.readFile(this.path, {flag: 'r'});
+
+            return safeStorage.decryptString(buffer);
+        }
+        return fs.readFile(this.path, {encoding: 'utf8', flag: 'r'});
     }
 
 }
