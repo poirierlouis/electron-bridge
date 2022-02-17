@@ -19,11 +19,10 @@ This is a monorepo containing two packages:
 
 ```
 electron-bridge
-  |
-  |-- demo/         # a demo to quickly test common modules.
-  |-- cli/          # electron-bridge-cli package to generate schemas.
-  |-- schemas/      # schemas of the Electron's main process modules to generate and expose.
-  |-- src/          # source files generated from schemas.
+├── demo/         # a demo to quickly test common modules.
+├── cli/          # electron-bridge-cli package to generate schemas.
+├── schemas/      # schemas of the Electron's main process modules to generate and expose.
+└── src/          # source files generated from schemas.
 ```
 
 

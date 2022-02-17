@@ -58,10 +58,9 @@ When generating files from schemas, `electron-bridge` is imported for you:
 Each schema will be generated in the `output` path using this structure:
 ```
 ${output}
-  |
-  |-- main/           # contains bridge classes (*.bridge.ts)
-  |-- preload/        # contains module classes (*.module.ts)
-  |-- renderer/       # contains api interfaces (*.api.ts) and augmented Window (renderer.ts)
+├── main/           # contains bridge classes (*.bridge.ts)
+├── preload/        # contains module classes (*.module.ts)
+└── renderer/       # contains api interfaces (*.api.ts) and augmented Window (renderer.ts)
 ```
 
 
