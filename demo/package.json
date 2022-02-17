@@ -12,7 +12,7 @@
     "electron": "tsc electron.dev.ts && electron electron.dev.js"
   },
   "dependencies": {
-    "@lpfreelance/electron-bridge": "file:../lpfreelance-electron-bridge-1.0.0.tgz"
+    "@lpfreelance/electron-bridge": "^1.0.1"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^9.0.1",
