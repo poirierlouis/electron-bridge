@@ -29,7 +29,7 @@ electron-bridge
 
 ## Install
 ```shell script
-$ npm install --save electron-bridge
+$ npm install --save @lpfreelance/electron-bridge
 ```
 
 
@@ -39,8 +39,8 @@ Here is a brief description of the names used, so that we are on the same page:
 
 |               Path | File                   | Symbol            | Description                             |
 |-------------------:|:-----------------------|-------------------|-----------------------------------------|
-| ./bridge/main/     | my-something.bridge.ts | MySomethingBridge | Class used in the main process.         |
-| ./bridge/preload/  | my-something.module.ts | MySomethingModule | Object used in the preload script.      |
+|     ./bridge/main/ | my-something.bridge.ts | MySomethingBridge | Class used in the main process.         |
+|  ./bridge/preload/ | my-something.module.ts | MySomethingModule | Object used in the preload script.      |
 | ./bridge/renderer/ | my-something.api.ts    | MySomethingApi    | Interface used in the renderer process. |
 |                    |                        |                   |                                         |
 | ./bridge/renderer/ | renderer.ts            | Window            | Augment Window with bridge's api.       |
@@ -56,21 +56,21 @@ contains homebrew bridges for the benefit of all developers.
 This table shows you currently implemented bridges:
 
 ### 1. Electron
-|           Bridge | Description      |
-|-----------------:|------------------|
-|      autoUpdater | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater) |
-|           dialog | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog) |
-|      nativeTheme | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme) |
-|     powerMonitor | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor) |
+|           Bridge | Description                                                                       |
+|-----------------:|-----------------------------------------------------------------------------------|
+|      autoUpdater | [cf Documentation](https://www.electronjs.org/docs/latest/api/auto-updater)       |
+|           dialog | [cf Documentation](https://www.electronjs.org/docs/latest/api/dialog)             |
+|      nativeTheme | [cf Documentation](https://www.electronjs.org/docs/latest/api/native-theme)       |
+|     powerMonitor | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-monitor)      |
 | powerSaveBlocker | [cf Documentation](https://www.electronjs.org/docs/latest/api/power-save-blocker) |
-|      safeStorage | [cf Documentation](https://www.electronjs.org/docs/latest/api/safe-storage) |
+|      safeStorage | [cf Documentation](https://www.electronjs.org/docs/latest/api/safe-storage)       |
 
 ### 2. Homebrew
-|           Bridge | Description      |
-|-----------------:|------------------|
-|       fileSystem | Very simple wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
-|             path | Wrapper for Node.js [path](https://nodejs.org/api/path.html) module. |
-|            store | JSON key/value storage solution. |
+|     Bridge | Description                                                                           |
+|-----------:|---------------------------------------------------------------------------------------|
+| fileSystem | Very simple wrapper for Node.js [file system](https://nodejs.org/api/fs.html) module. |
+|       path | Wrapper for Node.js [path](https://nodejs.org/api/path.html) module.                  |
+|      store | JSON key/value storage solution.                                                      |
 
 You can see usage of each bridge in [demo/](https://github.com/poirierlouis/electron-bridge/tree/master/demo).
 
