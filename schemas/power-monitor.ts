@@ -1,5 +1,5 @@
 import {BrowserWindow, powerMonitor} from "electron";
-import {EventListener, Schema} from "electron-bridge-cli";
+import {EventListener, Schema} from "@lpfreelance/electron-bridge-cli";
 
 /**
  * Monitor power state changes.

@@ -1,5 +1,5 @@
 import {autoUpdater, BrowserWindow, Event, FeedURLOptions} from 'electron';
-import {EventListener, Schema} from 'electron-bridge-cli';
+import {EventListener, Schema} from '@lpfreelance/electron-bridge-cli';
 
 /**
  * Enable apps to automatically update themselves.

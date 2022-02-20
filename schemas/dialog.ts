@@ -7,7 +7,7 @@ import {
     SaveDialogOptions,
     SaveDialogReturnValue
 } from "electron";
-import {Schema} from 'electron-bridge-cli';
+import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 /**
  * Display native system dialogs for opening and saving files, alerting, etc.

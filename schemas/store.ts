@@ -17,7 +17,7 @@ interface StoreItem {
  *
  * You can use chained dot notation with `set`, `has`, `get`, and `delete` operations like in example bellow:
  * ```javascript
- * () async {
+ * async () => {
  *     await store.set('people', {});
  *     await store.set('people.42', {id: 42, name: Grogu, age: NaN, force: Infinite});
  *     await store.set('people.42.age', 50);

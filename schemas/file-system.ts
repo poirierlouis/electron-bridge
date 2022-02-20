@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import {URL} from "url";
-import {Schema} from 'electron-bridge-cli';
+import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 export type PathLike = string | Buffer | URL;
 export type BufferEncoding = 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'latin1' | 'binary' | 'hex';

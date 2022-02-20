@@ -1,5 +1,5 @@
 import {BrowserWindow, nativeTheme} from "electron";
-import {EventListener, Schema} from "electron-bridge-cli";
+import {EventListener, Schema} from "@lpfreelance/electron-bridge-cli";
 
 /**
  * Emitted when something in the underlying NativeTheme has changed.
