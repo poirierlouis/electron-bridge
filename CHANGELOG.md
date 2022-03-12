@@ -1,0 +1,25 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+### Added
+- Encryption / decryption of data in homebrew store module.
+- Typescript to demo/package.json. [#1](https://github.com/poirierlouis/electron-bridge/pull/1)
+- More descriptive filters for demo/src/dialog.tab.ts. [#1](https://github.com/poirierlouis/electron-bridge/pull/1)
+- Changelog.
+
+## [1.0.1] - 2021-10-03
+### Added
+- README and LICENSE in deployed packages.
+
+## [1.0.0] - 2021-10-13
+### Added
+- Packages with `electron-bridge` and `electron-bridge-cli`.
+
+[Unreleased]: https://github.com/poirierlouis/electron-bridge/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/poirierlouis/electron-bridge/compare/v1.0.1...v1.1.0
+[1.0.1]: https://github.com/poirierlouis/electron-bridge/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/poirierlouis/electron-bridge/releases/tag/v1.0.0

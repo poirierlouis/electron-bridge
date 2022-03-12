@@ -1,5 +1,6 @@
 # electron-bridge-cli
 [![npm version](https://img.shields.io/npm/v/@lpfreelance/electron-bridge-cli)](https://www.npmjs.com/package/@lpfreelance/electron-bridge-cli)
+[![coverage](https://img.shields.io/badge/coverage-94%25-success)]()
 
 `electron-bridge-cli` is a tool to quickly create bridges for [electron-bridge](https://github.com/poirierlouis/electron-bridge).
 This is used internally to generate source files in `electron-bridge`.
