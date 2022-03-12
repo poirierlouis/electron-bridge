@@ -19,7 +19,7 @@ export class DialogTab extends AbstractTab {
                 title: 'My Awesome Dialog',
                 properties: ['openFile'],
                 filters: [
-                    {name: 'Awesome File', extensions: ['txt', 'json']}
+                    {name: 'Awesome File (txt or json)', extensions: ['txt', 'json']}
                 ]
             }).then(result => {
                 if (result.canceled || result.filePaths.length !== 1) {
