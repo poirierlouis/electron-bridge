@@ -51,7 +51,7 @@ therefore provides the same indentation, new line kind, etc. as your project.
 
 When generating files from schemas, `electron-bridge` is imported for you:
 - when working on `electron-bridge`, you need to set `"main": true` to import modules relative to the package (e.g. `import {Bridge} from './bridge.ts'`).
-- when working on any other project, you need to set `"main": false` to import modules from the package (e.g. `import {Bridge} from 'electron-bridge/main'`).
+- when working on your project, you need to set `"main": false` to import modules from the package (e.g. `import {Bridge} from '@lpfreelance/electron-bridge/main'`).
 
 
 
