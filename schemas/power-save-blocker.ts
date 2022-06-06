@@ -1,5 +1,5 @@
-import {powerSaveBlocker} from "electron";
-import {Schema} from "@lpfreelance/electron-bridge-cli";
+import {powerSaveBlocker} from 'electron';
+import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 /**
  * Block the system from entering low-power (sleep) mode.

@@ -1,5 +1,5 @@
-import { ipcMain, IpcMainInvokeEvent, powerSaveBlocker } from "electron";
-import { Bridge } from "./bridge";
+import {ipcMain, IpcMainInvokeEvent, powerSaveBlocker} from 'electron';
+import {Bridge} from './bridge';
 
 export class PowerSaveBlockerBridge implements Bridge {
     public register(): void {

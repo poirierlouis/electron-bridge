@@ -1,5 +1,5 @@
-import {safeStorage} from "electron";
-import {Schema} from "@lpfreelance/electron-bridge-cli";
+import {safeStorage} from 'electron';
+import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 /**
  * Allows access to simple encryption and decryption of strings for storage on the local machine.

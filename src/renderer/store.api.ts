@@ -1,4 +1,3 @@
-
 /**
  * Store data in user's application directory with JSON format (JSON.stringify / JSON.parse).
  * You can use OS solution to encrypt / decrypt data per store if available on device.
@@ -28,6 +27,7 @@ export interface StoreApi {
      * Default false. If *isEncrypted* is true and feature is not available on device, will silently fall back to false.
      */
     withStore(storePath?: string, isEncrypted?: boolean): Promise<void>;
+
     /**
      * Set a value into current store.
      *
@@ -35,6 +35,7 @@ export interface StoreApi {
      * @param value to set.
      */
     set(key: string, value: any): Promise<void>;
+
     /**
      * Returns if key exists or not.
      *
@@ -42,6 +43,7 @@ export interface StoreApi {
      * @returns true if key exists, false otherwise.
      */
     has(key: string): Promise<boolean>;
+
     /**
      * Returns value at given key's position.
      *
@@ -49,6 +51,7 @@ export interface StoreApi {
      * @return value found at key position, undefined otherwise.
      */
     get(key: string): Promise<any | undefined>;
+
     /**
      * Delete key from current store.
      * If key is not found, nothing happens.

@@ -1,7 +1,7 @@
-import { ipcMain, IpcMainInvokeEvent, safeStorage } from "electron";
-import * as fs from "fs/promises";
-import * as path from "path";
-import { Bridge } from "./bridge";
+import {ipcMain, IpcMainInvokeEvent, safeStorage} from 'electron';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import {Bridge} from './bridge';
 
 interface StoreItem {
     key: string;
@@ -46,12 +46,12 @@ export class StoreBridge implements Bridge {
             this.path = storePath;
             this.isEncrypted = isEncrypted;
             try {
-                        const data: string = await this.load();
+                const data: string = await this.load();
 
-                        this.store = JSON.parse(data);
-                    } catch (error) {
-                        this.store = {};
-                    }
+                this.store = JSON.parse(data);
+            } catch (error) {
+                this.store = {};
+            }
         });
         ipcMain.handle('eb.store.set', async (_: IpcMainInvokeEvent, key: string, value: any) => {
             const item: StoreItem | undefined = this.traverse(key, true);
@@ -122,20 +122,20 @@ export class StoreBridge implements Bridge {
     private update(): Promise<void> {
         let data: string = JSON.stringify(this.store);
         if (this.isEncrypted) {
-                    const buffer: Buffer = safeStorage.encryptString(data);
+            const buffer: Buffer = safeStorage.encryptString(data);
 
-                    return fs.writeFile(this.path, buffer, {flag: 'w'});
-                }
+            return fs.writeFile(this.path, buffer, {flag: 'w'});
+        }
 
         return fs.writeFile(this.path, data, {encoding: 'utf8', flag: 'w'});
     }
 
     private async load(): Promise<string> {
         if (this.isEncrypted) {
-                    const buffer: Buffer = await fs.readFile(this.path, {flag: 'r'});
+            const buffer: Buffer = await fs.readFile(this.path, {flag: 'r'});
 
-                    return safeStorage.decryptString(buffer);
-                }
+            return safeStorage.decryptString(buffer);
+        }
 
         return fs.readFile(this.path, {encoding: 'utf8', flag: 'r'});
     }

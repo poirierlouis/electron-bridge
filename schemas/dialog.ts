@@ -6,7 +6,7 @@ import {
     OpenDialogReturnValue,
     SaveDialogOptions,
     SaveDialogReturnValue
-} from "electron";
+} from 'electron';
 import {Schema} from '@lpfreelance/electron-bridge-cli';
 
 /**

@@ -1,5 +1,5 @@
-import { ipcMain, IpcMainInvokeEvent, safeStorage } from "electron";
-import { Bridge } from "./bridge";
+import {ipcMain, IpcMainInvokeEvent, safeStorage} from 'electron';
+import {Bridge} from './bridge';
 
 export class SafeStorageBridge implements Bridge {
     public register(): void {

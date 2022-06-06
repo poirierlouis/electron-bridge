@@ -35,8 +35,11 @@
     "pack": "node pack.js && npm pack ./dist"
   },
   "devDependencies": {
-    "electron": ">=9.0.0",
     "@lpfreelance/electron-bridge-cli": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "electron": ">=9.0.0",
+    "eslint": "^8.17.0",
     "shx": "^0.3.4",
     "ts-loader": "^9.3.0",
     "typescript": "^4.7.3",

@@ -1,6 +1,6 @@
-import { ipcRenderer } from "electron";
-import { FormatInputPathObject } from "../renderer/path.api";
-import { BridgeModule } from "./bridge.module";
+import {ipcRenderer} from 'electron';
+import {FormatInputPathObject} from '../renderer/path.api';
+import {BridgeModule} from './bridge.module';
 
 export const PathModule: BridgeModule = {
     name: 'path',

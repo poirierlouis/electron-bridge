@@ -26,7 +26,7 @@ export class AutoUpdater {
             this.win.webContents.send(`eb.autoUpdater.error`, error);
         });
         autoUpdater.on('update-downloaded', (event: Event, releaseNotes: string, releaseName: string,
-                                             releaseDate: Date, updateURL: string) => {
+            releaseDate: Date, updateURL: string) => {
             this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName,
                 releaseDate, updateURL);
         });
@@ -76,7 +76,7 @@ export class AutoUpdater {
 
     @EventListener('update-downloaded')
     public onUpdateDownloaded(listener: (event: Event, releaseNotes: string, releaseName: string, releaseDate: Date,
-                                         updateURL: string) => void): void {
+        updateURL: string) => void): void {
 
     }
 

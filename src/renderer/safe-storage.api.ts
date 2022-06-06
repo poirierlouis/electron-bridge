@@ -1,4 +1,3 @@
-
 /**
  * Allows access to simple encryption and decryption of strings for storage on the local machine.
  */
@@ -10,6 +9,7 @@ export interface SafeStorageApi {
      * @returns Whether encryption is available.
      */
     isEncryptionAvailable(): Promise<boolean>;
+
     /**
      * This function will throw an error if encryption fails.
      *
@@ -17,6 +17,7 @@ export interface SafeStorageApi {
      * @returns An array of bytes representing the encrypted string.
      */
     encryptString(plainText: string): Promise<ArrayBuffer>;
+
     /**
      * This function will throw an error if decryption fails.
      *

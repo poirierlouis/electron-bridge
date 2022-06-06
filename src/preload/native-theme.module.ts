@@ -1,6 +1,6 @@
-import { ipcRenderer, IpcRendererEvent } from "electron";
-import { ThemeUpdatedEvent } from "../renderer/native-theme.api";
-import { BridgeModule } from "./bridge.module";
+import {ipcRenderer, IpcRendererEvent} from 'electron';
+import {ThemeUpdatedEvent} from '../renderer/native-theme.api';
+import {BridgeModule} from './bridge.module';
 
 export const NativeThemeModule: BridgeModule = {
     name: 'nativeTheme',

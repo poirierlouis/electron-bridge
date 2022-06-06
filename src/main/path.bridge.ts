@@ -1,7 +1,7 @@
-import { ipcMain, IpcMainInvokeEvent } from "electron";
-import * as nodePath from "path";
-import { FormatInputPathObject } from "../renderer/path.api";
-import { Bridge } from "./bridge";
+import {ipcMain, IpcMainInvokeEvent} from 'electron';
+import * as nodePath from 'path';
+import {FormatInputPathObject} from '../renderer/path.api';
+import {Bridge} from './bridge';
 
 export class PathBridge implements Bridge {
     public register(): void {

@@ -1,4 +1,4 @@
-import {BridgeApi, DefaultMainModule} from "./typings";
+import {BridgeApi, DefaultMainModule} from './typings';
 
 /**
  * A bridge module to be registered using Context Bridge.

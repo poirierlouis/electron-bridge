@@ -1,4 +1,3 @@
-
 /**
  * Emitted when something in the underlying NativeTheme has changed.
  */
@@ -13,8 +12,12 @@ export interface ThemeUpdatedEvent {
  */
 export interface NativeThemeApi {
     shouldUseDarkColors(): Promise<boolean>;
+
     shouldUseHighContrastColors(): Promise<boolean>;
+
     shouldUseInvertedColorScheme(): Promise<boolean>;
+
     themeSource(value: 'system' | 'light' | 'dark'): Promise<void>;
+
     onUpdated(listener: (event: ThemeUpdatedEvent) => void): void;
 }

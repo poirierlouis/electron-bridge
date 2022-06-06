@@ -1,13 +1,13 @@
 import {contextBridge} from 'electron';
-import {BridgeModule} from "./bridge.module";
-import {DefaultMainModule} from "./typings";
-import {DialogModule} from "./dialog.module";
-import {NativeThemeModule} from "./native-theme.module";
-import {StoreModule} from "./store.module";
-import {PathModule} from "./path.module";
-import {PowerMonitorModule} from "./power-monitor.module";
-import {AutoUpdaterModule} from "./auto-updater.module";
-import {FileSystemModule} from "./file-system.module";
+import {BridgeModule} from './bridge.module';
+import {DefaultMainModule} from './typings';
+import {DialogModule} from './dialog.module';
+import {NativeThemeModule} from './native-theme.module';
+import {StoreModule} from './store.module';
+import {PathModule} from './path.module';
+import {PowerMonitorModule} from './power-monitor.module';
+import {AutoUpdaterModule} from './auto-updater.module';
+import {FileSystemModule} from './file-system.module';
 
 /**
  * Service to add common and custom modules to preload.

@@ -1,5 +1,5 @@
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeTheme } from "electron";
-import { Bridge } from "./bridge";
+import {BrowserWindow, ipcMain, IpcMainInvokeEvent, nativeTheme} from 'electron';
+import {Bridge} from './bridge';
 
 export class NativeThemeBridge implements Bridge {
     constructor(private win: BrowserWindow) {

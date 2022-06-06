@@ -1,5 +1,5 @@
-import { ipcRenderer } from "electron";
-import { BridgeModule } from "./bridge.module";
+import {ipcRenderer} from 'electron';
+import {BridgeModule} from './bridge.module';
 
 export const SafeStorageModule: BridgeModule = {
     name: 'safeStorage',

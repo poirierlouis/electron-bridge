@@ -1,5 +1,5 @@
-import { FeedURLOptions, ipcRenderer, IpcRendererEvent } from "electron";
-import { BridgeModule } from "./bridge.module";
+import {FeedURLOptions, ipcRenderer, IpcRendererEvent} from 'electron';
+import {BridgeModule} from './bridge.module';
 
 export const AutoUpdaterModule: BridgeModule = {
     name: 'autoUpdater',
@@ -38,9 +38,9 @@ export const AutoUpdaterModule: BridgeModule = {
             });
         },
         onUpdateDownloaded: (listener: (event: Event, releaseNotes: string, releaseName: string, releaseDate: Date,
-                                                 updateURL: string) => void) => {
+            updateURL: string) => void) => {
             ipcRenderer.on('eb.autoUpdater.update-downloaded', (_: IpcRendererEvent, event: Event, releaseNotes: string, releaseName: string, releaseDate: Date,
-                                                     updateURL: string) => {
+                updateURL: string) => {
                 listener(event, releaseNotes, releaseName, releaseDate, updateURL);
             });
         },

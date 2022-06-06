@@ -1,10 +1,14 @@
 .idea/
-demo/node_modules/
 node_modules/
-*.tgz
 dist/
-cli/test/src/
 src/index.js
+src
+
+demo/node_modules/
 demo/src/electron.dev.js
 demo/src/electron.preload.js
+
+cli/test/src/
 cli/coverage/
+
+*.tgz

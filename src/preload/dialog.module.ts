@@ -1,5 +1,5 @@
-import { ipcRenderer, MessageBoxOptions, OpenDialogOptions, SaveDialogOptions } from "electron";
-import { BridgeModule } from "./bridge.module";
+import {ipcRenderer, MessageBoxOptions, OpenDialogOptions, SaveDialogOptions} from 'electron';
+import {BridgeModule} from './bridge.module';
 
 export const DialogModule: BridgeModule = {
     name: 'dialog',

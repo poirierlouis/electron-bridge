@@ -1,17 +1,17 @@
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent, powerMonitor } from "electron";
-import { Bridge } from "./bridge";
+import {BrowserWindow, ipcMain, IpcMainInvokeEvent, powerMonitor} from 'electron';
+import {Bridge} from './bridge';
 
 export class PowerMonitorBridge implements Bridge {
     private static events: string[] = [
-                'suspend',
-                'resume',
-                'on-ac',
-                'on-battery',
-                'lock-screen',
-                'unlock-screen',
-                'user-did-become-active',
-                'user-did-resign-active'
-            ];
+        'suspend',
+        'resume',
+        'on-ac',
+        'on-battery',
+        'lock-screen',
+        'unlock-screen',
+        'user-did-become-active',
+        'user-did-resign-active'
+    ];
 
     constructor(private win: BrowserWindow) {
     }

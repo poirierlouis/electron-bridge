@@ -1,13 +1,13 @@
-import { autoUpdater, BrowserWindow, Event, FeedURLOptions, ipcMain, IpcMainInvokeEvent } from "electron";
-import { Bridge } from "./bridge";
+import {autoUpdater, BrowserWindow, Event, FeedURLOptions, ipcMain, IpcMainInvokeEvent} from 'electron';
+import {Bridge} from './bridge';
 
 export class AutoUpdaterBridge implements Bridge {
     private static events: string[] = [
-                'checking-for-update',
-                'update-available',
-                'update-not-available',
-                'before-quit-for-update'
-            ];
+        'checking-for-update',
+        'update-available',
+        'update-not-available',
+        'before-quit-for-update'
+    ];
 
     constructor(private win: BrowserWindow) {
     }
@@ -20,7 +20,7 @@ export class AutoUpdaterBridge implements Bridge {
             this.win.webContents.send(`eb.autoUpdater.error`, error);
         });
         autoUpdater.on('update-downloaded', (event: Event, releaseNotes: string, releaseName: string,
-                                             releaseDate: Date, updateURL: string) => {
+            releaseDate: Date, updateURL: string) => {
             this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName,
                 releaseDate, updateURL);
         });

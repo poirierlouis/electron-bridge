@@ -1,5 +1,5 @@
-import { dialog, ipcMain, IpcMainInvokeEvent, MessageBoxOptions, OpenDialogOptions, SaveDialogOptions } from "electron";
-import { Bridge } from "./bridge";
+import {dialog, ipcMain, IpcMainInvokeEvent, MessageBoxOptions, OpenDialogOptions, SaveDialogOptions} from 'electron';
+import {Bridge} from './bridge';
 
 export class DialogBridge implements Bridge {
     public register(): void {

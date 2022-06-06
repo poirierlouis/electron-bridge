@@ -1,5 +1,5 @@
-import { ipcRenderer, IpcRendererEvent } from "electron";
-import { BridgeModule } from "./bridge.module";
+import {ipcRenderer, IpcRendererEvent} from 'electron';
+import {BridgeModule} from './bridge.module';
 
 export const PowerMonitorModule: BridgeModule = {
     name: 'powerMonitor',
