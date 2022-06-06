@@ -1,6 +1,6 @@
 {
   "name": "@lpfreelance/electron-bridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Safely expose main process modules of Electron to renderer process through IPC.",
   "author": "Louis Poirier",
   "license": "MIT",
