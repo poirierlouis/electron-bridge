@@ -1,6 +1,7 @@
 import {
     CodeBlockWriter,
     ConstructorDeclarationStructure,
+    FormatCodeSettings,
     ImportDeclarationStructure,
     MethodDeclarationStructure,
     Project,
@@ -18,7 +19,8 @@ import {Configuration} from './configuration';
 export class BridgeGenerator {
 
     constructor(private project: Project,
-        private config: Configuration) {
+        private config: Configuration,
+        private format: FormatCodeSettings) {
 
     }
 
@@ -50,6 +52,7 @@ export class BridgeGenerator {
         file.fixUnusedIdentifiers();
         file.fixMissingImports();
         file.organizeImports();
+        file.formatText(this.format);
         return file;
     }
 

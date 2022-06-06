@@ -3,7 +3,14 @@
 import * as yargs from 'yargs';
 import * as fs from 'fs';
 import * as path from 'path';
-import {CodeBlockWriter, ImportDeclarationStructure, Project, SourceFile, StructureKind} from 'ts-morph';
+import {
+    CodeBlockWriter,
+    FormatCodeSettings,
+    ImportDeclarationStructure,
+    Project,
+    SourceFile,
+    StructureKind
+} from 'ts-morph';
 import {Configuration} from './configuration';
 import {SchemaParser} from './schema.parser';
 import {ApiGenerator} from './api.generator';
@@ -23,6 +30,7 @@ interface GenerateArguments {
 export class ElectronBridgeCli {
 
     private readonly config: Configuration;
+    private readonly format: FormatCodeSettings;
     private project!: Project;
     private parser!: SchemaParser;
 
@@ -38,6 +46,18 @@ export class ElectronBridgeCli {
             output: 'src/bridge/',
             main: false,
             verbose: false
+        };
+        this.format = {
+            convertTabsToSpaces: true,
+            trimTrailingWhitespace: true,
+            placeOpenBraceOnNewLineForControlBlocks: false,
+            placeOpenBraceOnNewLineForFunctions: false,
+            insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingEmptyBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
+            insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false
         };
     }
 
@@ -221,9 +241,9 @@ export class ElectronBridgeCli {
         this.project.addSourceFilesAtPaths(globPath);
         //this.project.resolveSourceFileDependencies();
         this.parser = new SchemaParser(this.config);
-        this.apiGenerator = new ApiGenerator(this.project, this.config);
-        this.moduleGenerator = new ModuleGenerator(this.project, this.config);
-        this.bridgeGenerator = new BridgeGenerator(this.project, this.config);
+        this.apiGenerator = new ApiGenerator(this.project, this.config, this.format);
+        this.moduleGenerator = new ModuleGenerator(this.project, this.config, this.format);
+        this.bridgeGenerator = new BridgeGenerator(this.project, this.config, this.format);
         Logger.info(`<project path="${globPath}">`);
         Logger.indent();
     }

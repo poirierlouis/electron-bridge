@@ -2,6 +2,7 @@ import {
     ClassDeclaration,
     CodeBlockWriter,
     Decorator,
+    FormatCodeSettings,
     ImportDeclarationStructure,
     ParameterDeclaration,
     Project,
@@ -17,7 +18,8 @@ import {Configuration} from './configuration';
 export class ModuleGenerator {
 
     constructor(private project: Project,
-        private config: Configuration) {
+        private config: Configuration,
+        private format: FormatCodeSettings) {
 
     }
 
@@ -34,6 +36,7 @@ export class ModuleGenerator {
         file.fixUnusedIdentifiers();
         file.fixMissingImports();
         file.organizeImports();
+        file.formatText(this.format);
         return file;
     }
 

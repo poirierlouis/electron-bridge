@@ -1,6 +1,6 @@
 import {SchemaParser} from '../src/schema.parser';
 import {Configuration} from '../src/configuration';
-import {NewLineKind, Project, SourceFile} from 'ts-morph';
+import {FormatCodeSettings, NewLineKind, Project, SourceFile} from 'ts-morph';
 import * as path from 'path';
 import {ApiGenerator} from '../src/api.generator';
 import {ModuleGenerator} from '../src/module.generator';
@@ -16,6 +16,7 @@ export interface Parameter {
 export class CliHelper {
 
     public readonly config: Configuration;
+    public readonly format: FormatCodeSettings;
     public readonly parser: SchemaParser;
     public readonly apiGenerator: ApiGenerator;
     public readonly moduleGenerator: ModuleGenerator;
@@ -32,6 +33,18 @@ export class CliHelper {
             tsconfig: 'tsconfig.json',
             verbose: false
         }, config);
+        this.format = {
+            convertTabsToSpaces: true,
+            trimTrailingWhitespace: true,
+            placeOpenBraceOnNewLineForControlBlocks: false,
+            placeOpenBraceOnNewLineForFunctions: false,
+            insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingEmptyBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
+            insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false
+        };
         this.parser = new SchemaParser(this.config);
         this.project = new Project({
             tsConfigFilePath: this.config.tsconfig,
@@ -39,9 +52,9 @@ export class CliHelper {
             skipFileDependencyResolution: true
         });
         this.project.addSourceFilesAtPaths(path.join(this.config.base, this.config.schemas, '**', '*.ts'));
-        this.apiGenerator = new ApiGenerator(this.project, this.config);
-        this.moduleGenerator = new ModuleGenerator(this.project, this.config);
-        this.bridgeGenerator = new BridgeGenerator(this.project, this.config);
+        this.apiGenerator = new ApiGenerator(this.project, this.config, this.format);
+        this.moduleGenerator = new ModuleGenerator(this.project, this.config, this.format);
+        this.bridgeGenerator = new BridgeGenerator(this.project, this.config, this.format);
     }
 
     public getPath(fileName: string): string {

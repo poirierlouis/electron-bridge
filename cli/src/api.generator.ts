@@ -1,5 +1,6 @@
 import {
     ClassDeclarationStructure,
+    FormatCodeSettings,
     InterfaceDeclarationStructure,
     MethodSignatureStructure,
     Project,
@@ -14,7 +15,8 @@ import {Configuration} from './configuration';
 export class ApiGenerator {
 
     constructor(private project: Project,
-        private config: Configuration) {
+        private config: Configuration,
+        private format: FormatCodeSettings) {
 
     }
 
@@ -49,6 +51,8 @@ export class ApiGenerator {
         file.fixUnusedIdentifiers();
         file.fixMissingImports();
         file.organizeImports();
+        file.formatText();
+        file.formatText(this.format);
         return file;
     }
 
