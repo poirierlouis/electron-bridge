@@ -111,7 +111,8 @@ export class MyBridge {
 
     }
 
-    @EventListener('not-sent')
+    // Uses double-quotes on purpose!
+    @EventListener("not-sent")
     public onEmailNotSent(listener: (event: EmailNotSentEvent) => void): void {
 
     }

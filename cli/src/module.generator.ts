@@ -158,7 +158,7 @@ export class ModuleGenerator {
         if (decorator.getArguments().length === 0) {
             return orElse;
         }
-        return decorator.getArguments()[0].getFullText().replace(/'/g, '');
+        return decorator.getArguments()[0].getFullText().replace(/['"]/g, '');
     }
 
     private static getCallbackSignatureFromParameter(parameter: ParameterDeclaration): any {

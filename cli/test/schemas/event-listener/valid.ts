@@ -8,6 +8,11 @@ export class ValidEventListener {
 
     }
 
+    @EventListener("valid-quotes")
+    public onValidUsingDoubleQuotes(listener: Function): void {
+
+    }
+
     @EventListener('valid-arrow')
     public onValidWithArrowFunction(listener: () => void): void {
 

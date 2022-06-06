@@ -13,7 +13,7 @@ beforeAll(() => {
     helper = new CliHelper();
 });
 
-function expectEventListener(eventListener: MethodDeclarationStructure, name: string, eventName: string): void {
+function expectEventListener(eventListener: MethodDeclarationStructure, name: string, eventName: string, usingDoubleQuotes: boolean = false): void {
     expect(eventListener.name).toEqual(name);
     expect(eventListener.decorators).toHaveLength(1);
     if (!eventListener.decorators) return;
@@ -21,7 +21,11 @@ function expectEventListener(eventListener: MethodDeclarationStructure, name: st
     const decorator: DecoratorStructure = <DecoratorStructure>eventListener.decorators[0];
 
     expect(decorator.name).toEqual('EventListener');
-    expect(decorator.arguments).toEqual([`'${eventName}'`]);
+    if (usingDoubleQuotes) {
+        expect(decorator.arguments).toEqual([`"${eventName}"`]);
+    } else {
+        expect(decorator.arguments).toEqual([`'${eventName}'`]);
+    }
 }
 
 describe(`when parsing`, () => {
@@ -70,12 +74,13 @@ describe(`when parsing`, () => {
             expect(schema).toBeDefined();
             if (!schema) return;
 
-            expect(schema.eventListeners).toHaveLength(3);
+            expect(schema.eventListeners).toHaveLength(4);
             if (!schema.eventListeners) return;
 
             expectEventListener(schema.eventListeners[0], 'onValid', 'valid');
-            expectEventListener(schema.eventListeners[1], 'onValidWithArrowFunction', 'valid-arrow');
-            expectEventListener(schema.eventListeners[2], 'onValidWithArrowFunctionWithArguments', 'valid-arrow-args');
+            expectEventListener(schema.eventListeners[1], 'onValidUsingDoubleQuotes', 'valid-quotes', true);
+            expectEventListener(schema.eventListeners[2], 'onValidWithArrowFunction', 'valid-arrow');
+            expectEventListener(schema.eventListeners[3], 'onValidWithArrowFunctionWithArguments', 'valid-arrow-args');
         });
 
     });
