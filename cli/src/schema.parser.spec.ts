@@ -1,11 +1,11 @@
-import {DecoratorStructure, MethodDeclarationStructure, SourceFile} from "ts-morph";
-import {CliHelper} from "../test/cli.helper";
-import {TooMuchSchemaError} from "./errors/too-much-schema.error";
-import {SchemaNotFoundError} from "./errors/schema-not-found.error";
-import {Schema} from "./schema";
-import {ParameterNotFoundError} from "./errors/parameter-not-found.error";
-import {TooMuchParametersError} from "./errors/too-much-parameters.error";
-import {CallbackNotFoundError} from "./errors/callback-not-found.error";
+import {DecoratorStructure, MethodDeclarationStructure, SourceFile} from 'ts-morph';
+import {CliHelper} from '../test/cli.helper';
+import {TooMuchSchemaError} from './errors/too-much-schema.error';
+import {SchemaNotFoundError} from './errors/schema-not-found.error';
+import {Schema} from './schema';
+import {ParameterNotFoundError} from './errors/parameter-not-found.error';
+import {TooMuchParametersError} from './errors/too-much-parameters.error';
+import {CallbackNotFoundError} from './errors/callback-not-found.error';
 
 let helper: CliHelper;
 
@@ -20,13 +20,13 @@ function expectEventListener(eventListener: MethodDeclarationStructure, name: st
 
     const decorator: DecoratorStructure = <DecoratorStructure>eventListener.decorators[0];
 
-    expect(decorator.name).toEqual("EventListener");
+    expect(decorator.name).toEqual('EventListener');
     expect(decorator.arguments).toEqual([`'${eventName}'`]);
 }
 
 describe(`when parsing`, () => {
 
-    describe(`Tests @Schema(readonly) decorator usage and unicity.`, () => {
+    describe(`Tests @Schema(readonly) decorator usage and unity.`, () => {
 
         test('given a file with multiple schema decorators then throw TooMuchSchemaError.', () => {
             const file: SourceFile = helper.getSourceFile('too-much-schema.ts');

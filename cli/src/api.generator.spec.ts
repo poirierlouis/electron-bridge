@@ -1,6 +1,6 @@
-import {CliHelper} from "../test/cli.helper";
-import {InterfaceDeclaration, JSDoc, MethodSignature, ParameterDeclaration, SourceFile, TypeNode} from "ts-morph";
-import {Schema} from "./schema";
+import {CliHelper} from '../test/cli.helper';
+import {InterfaceDeclaration, JSDoc, MethodSignature, ParameterDeclaration, SourceFile, TypeNode} from 'ts-morph';
+import {Schema} from './schema';
 
 let helper: CliHelper;
 let file: SourceFile;
@@ -17,9 +17,9 @@ beforeAll(() => {
 });
 
 function expectSignature(id: InterfaceDeclaration,
-                         name: string,
-                         returnType: string,
-                         parameters: {name: string, type: string}[] = []): MethodSignature | undefined {
+    name: string,
+    returnType: string,
+    parameters: { name: string, type: string }[] = []): MethodSignature | undefined {
     const signature: MethodSignature | undefined = id.getMethod(name);
 
     expect(signature).toBeDefined();

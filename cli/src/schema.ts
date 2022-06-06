@@ -8,7 +8,7 @@ import {
     MethodDeclarationStructure,
     SourceFile,
     TypeAliasDeclarationStructure
-} from "ts-morph";
+} from 'ts-morph';
 
 export interface Schema {
 

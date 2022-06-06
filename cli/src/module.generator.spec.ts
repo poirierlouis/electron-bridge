@@ -1,8 +1,8 @@
-import {CliHelper} from "../test/cli.helper";
+import {CliHelper} from '../test/cli.helper';
 import {
     ArrowFunction,
-    CallSignatureDeclaration,
-    Expression, MethodDeclaration,
+    Expression,
+    MethodDeclaration,
     ObjectLiteralExpression,
     ParameterDeclaration,
     PropertyAssignment,
@@ -11,8 +11,8 @@ import {
     Statement,
     SyntaxKind,
     VariableDeclaration
-} from "ts-morph";
-import {Schema} from "./schema";
+} from 'ts-morph';
+import {Schema} from './schema';
 
 let helper: CliHelper;
 let file: SourceFile;
@@ -37,9 +37,9 @@ beforeAll(() => {
  * @param parameters if lambda signature is expected to contains parameters, empty otherwise.
  */
 function expectInvoker(object: ObjectLiteralExpression,
-                       name: string,
-                       isAsync: boolean,
-                       parameters: {name: string, type?: string}[] = []): void {
+    name: string,
+    isAsync: boolean,
+    parameters: { name: string, type?: string }[] = []): void {
     const property: PropertyAssignment | undefined = <PropertyAssignment | undefined>object.getProperty(name);
 
     expect(property).toBeDefined();
@@ -65,7 +65,7 @@ function expectInvoker(object: ObjectLiteralExpression,
         if (!pd) return;
         if (!parameter.type) return;
         expect(pd.getTypeNode()!.getFullText().trim()).toEqual(parameter.type);
-    })
+    });
 
     const statements: Statement[] = lambda.getStatements();
 
@@ -80,7 +80,7 @@ function expectInvoker(object: ObjectLiteralExpression,
         if (i + 1 < parameters.length) {
             endStatement += ', ';
         }
-    })
+    });
     endStatement += ');';
     if (isAsync) {
         expect(statements[0].getFullText().trim())
@@ -92,10 +92,10 @@ function expectInvoker(object: ObjectLiteralExpression,
 }
 
 function expectListener(object: ObjectLiteralExpression,
-                       name: string,
-                       eventName: string,
-                       documentation?: string,
-                       parameters: {name: string, type?: string}[] = []): void {
+    name: string,
+    eventName: string,
+    documentation?: string,
+    parameters: { name: string, type?: string }[] = []): void {
     const property: PropertyAssignment | undefined = <PropertyAssignment | undefined>object.getProperty(name);
 
     expect(property).toBeDefined();
@@ -133,13 +133,13 @@ function expectListener(object: ObjectLiteralExpression,
             if (!parameter.type) return;
 
             expect(pd.getTypeNode()?.getFullText().trim()).toEqual(parameter.type);
-        })
+        });
     }
 
     const statements: Statement[] = lambda.getStatements();
 
     expect(statements).toHaveLength(1);
-    let statement: string = '';
+    let statement: string;
     let argsStatement: string = '';
     let valuesStatement: string = '';
 
@@ -156,7 +156,7 @@ function expectListener(object: ObjectLiteralExpression,
             argsStatement += ',';
             valuesStatement += ', ';
         }
-    })
+    });
     statement = `ipcRenderer.on('eb.myBridge.${eventName}',(${argsStatement})=>{`;
     statement += `${parameter.getName()}(${valuesStatement});`;
     statement += `});`;

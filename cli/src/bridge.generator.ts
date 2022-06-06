@@ -10,15 +10,15 @@ import {
     StructureKind,
     VariableDeclarationStructure,
     WriterFunction
-} from "ts-morph";
-import {Schema} from "./schema";
-import * as path from "path";
-import {Configuration} from "./configuration";
+} from 'ts-morph';
+import {Schema} from './schema';
+import * as path from 'path';
+import {Configuration} from './configuration';
 
 export class BridgeGenerator {
 
     constructor(private project: Project,
-                private config: Configuration) {
+        private config: Configuration) {
 
     }
 
@@ -35,7 +35,7 @@ export class BridgeGenerator {
             isExported: true,
             name: `${schema.className}Bridge`,
             implements: ['Bridge'],
-            ctors: this.generateConstructor(schema),
+            ctors: BridgeGenerator.generateConstructor(schema),
             methods: [
                 this.generateRegister(schema),
                 this.generateRelease(schema),
@@ -68,13 +68,6 @@ export class BridgeGenerator {
             moduleSpecifier: 'electron'
         });
         return imports;
-    }
-
-    private generateConstructor(schema: Schema): ConstructorDeclarationStructure[] {
-        if (!schema.ctor) {
-            return [];
-        }
-        return [schema.ctor];
     }
 
     private generateRegister(schema: Schema): MethodDeclarationStructure {
@@ -171,6 +164,13 @@ export class BridgeGenerator {
 
     private getPath(schema: Schema): string {
         return path.join(this.config.output, 'main', `${schema.fileName}.bridge.ts`);
+    }
+
+    private static generateConstructor(schema: Schema): ConstructorDeclarationStructure[] {
+        if (!schema.ctor) {
+            return [];
+        }
+        return [schema.ctor];
     }
 
 }

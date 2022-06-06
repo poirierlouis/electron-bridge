@@ -1,4 +1,4 @@
-import {AbstractError} from "./abstract.error";
+import {AbstractError} from './abstract.error';
 
 export class ParameterNotFoundError extends AbstractError {
 

@@ -6,15 +6,15 @@ import {
     SourceFile,
     StructureKind,
     TypeAliasDeclarationStructure
-} from "ts-morph";
-import {Schema} from "./schema";
-import * as path from "path";
-import {Configuration} from "./configuration";
+} from 'ts-morph';
+import {Schema} from './schema';
+import * as path from 'path';
+import {Configuration} from './configuration';
 
 export class ApiGenerator {
 
     constructor(private project: Project,
-                private config: Configuration) {
+        private config: Configuration) {
 
     }
 

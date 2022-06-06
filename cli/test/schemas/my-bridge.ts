@@ -1,7 +1,7 @@
 import {BrowserWindow} from 'electron';
-import {EventListener, Schema} from "electron-bridge-cli";
+import {EventListener, Schema} from '@lpfreelance/electron-bridge-cli';
 
-type NotMyType = {version: number, magic: number};
+type NotMyType = { version: number, magic: number };
 
 /**
  *
@@ -21,7 +21,7 @@ class NotToBeCopiedInApi {
 
 }
 
-export type MyType = {struct: string, typedef: string};
+export type MyType = { struct: string, typedef: string };
 
 /**
  * Contains when and to whom last email was successfully sent.
@@ -56,8 +56,8 @@ export class MyBridge {
     private used: NotToBeCopiedInApi;
 
     constructor(private readonly emailClient: any,
-                private readonly path: string,
-                private readonly win: BrowserWindow) {
+        private readonly path: string,
+        private readonly win: BrowserWindow) {
         this.used = new NotToBeCopiedInApi();
         this.used.functionalTestPurpose.version = 1;
         this.used.functionalTestPurpose.magic = 42;

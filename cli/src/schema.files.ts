@@ -1,4 +1,4 @@
-import {SourceFile} from "ts-morph";
+import {SourceFile} from 'ts-morph';
 
 export interface SchemaFiles {
 

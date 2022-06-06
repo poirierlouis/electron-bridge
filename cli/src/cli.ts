@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 import * as yargs from 'yargs';
-import * as fs from "fs";
-import * as path from "path";
-import {CodeBlockWriter, ImportDeclarationStructure, Project, SourceFile, StructureKind} from "ts-morph";
-import {Configuration} from "./configuration";
-import {SchemaParser} from "./schema.parser";
-import {ApiGenerator} from "./api.generator";
-import {Schema} from "./schema";
-import {AbstractError} from "./errors/abstract.error";
-import {ModuleGenerator} from "./module.generator";
-import {BridgeGenerator} from "./bridge.generator";
-import {SchemaFiles} from "./schema.files";
-import {Logger, LogLevel} from "./logger";
+import * as fs from 'fs';
+import * as path from 'path';
+import {CodeBlockWriter, ImportDeclarationStructure, Project, SourceFile, StructureKind} from 'ts-morph';
+import {Configuration} from './configuration';
+import {SchemaParser} from './schema.parser';
+import {ApiGenerator} from './api.generator';
+import {Schema} from './schema';
+import {AbstractError} from './errors/abstract.error';
+import {ModuleGenerator} from './module.generator';
+import {BridgeGenerator} from './bridge.generator';
+import {SchemaFiles} from './schema.files';
+import {Logger, LogLevel} from './logger';
 
 interface GenerateArguments {
 
@@ -47,7 +47,7 @@ export class ElectronBridgeCli {
         let declaration: SourceFile;
 
         Logger.info(`<electron-bridge-cli version="1.0.0">`)
-              .indent();
+            .indent();
 
         this.readConfiguration(argv.config);
         this.prepareProject();
@@ -59,7 +59,7 @@ export class ElectronBridgeCli {
         declaration.saveSync();
 
         Logger.unindent().info(`</project>`)
-              .unindent().info(`</electron-bridge-cli>`);
+            .unindent().info(`</electron-bridge-cli>`);
         return 0;
     }
 
@@ -102,8 +102,8 @@ export class ElectronBridgeCli {
         let files: SchemaFiles[];
 
         Logger.info(``)
-              .info(`<generator>`)
-              .indent();
+            .info(`<generator>`)
+            .indent();
         files = schemas.map(schema => {
             const schemaFiles: SchemaFiles = {
                 fileName: schema.fileName,
@@ -140,11 +140,11 @@ export class ElectronBridgeCli {
         files = files.filter(schema => schema !== null);
 
         const schemasLines: number = schemas.map(schema => schema.sourceFile.getEndLineNumber())
-                                            .reduce((previous, current) => previous + current);
+            .reduce((previous, current) => previous + current);
         const filesLines: number = files.map(schema => {
             return schema.apiFile.getEndLineNumber() +
-                   schema.moduleFile.getEndLineNumber() +
-                   schema.bridgeFile.getEndLineNumber();
+                schema.moduleFile.getEndLineNumber() +
+                schema.bridgeFile.getEndLineNumber();
         }).reduce((previous, current) => previous + current);
         const roi: number = 100 - Math.round(schemasLines / filesLines * 100);
 
@@ -256,14 +256,14 @@ export class ElectronBridgeCli {
 const cli: ElectronBridgeCli = new ElectronBridgeCli();
 
 yargs.scriptName('eb')
-     .usage('$0 <cmd> [args]')
-     // @ts-ignore
-     .command('generate <config>', 'Generate bridges from schemas.', (args) => {
-         args.positional('config', {
-             type: 'string',
-             default: 'bridge.config.json',
-             describe: 'Path to the configuration file.'
-         });
-     }, cli.generate.bind(cli))
-     .help()
-     .argv;
+    .usage('$0 <cmd> [args]')
+    // @ts-ignore
+    .command('generate <config>', 'Generate bridges from schemas.', (args) => {
+        args.positional('config', {
+            type: 'string',
+            default: 'bridge.config.json',
+            describe: 'Path to the configuration file.'
+        });
+    }, cli.generate.bind(cli))
+    .help()
+    .argv;

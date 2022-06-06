@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import chalk from 'chalk';
 
 export enum LogLevel {
     DEBUG,
@@ -19,7 +19,7 @@ export class Logger {
 
     private level: LogLevel = LogLevel.INFO;
     private indentLevel: number = 0;
-    
+
     private constructor() {
         this.level = LogLevel.INFO;
         this.indentLevel = 0;

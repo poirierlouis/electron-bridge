@@ -1,4 +1,4 @@
-import {Schema} from "./schema";
+import {Schema} from './schema';
 import {
     ClassDeclaration,
     ConstructorDeclarationStructure,
@@ -7,14 +7,14 @@ import {
     ParameterDeclaration,
     Scope,
     SourceFile
-} from "ts-morph";
-import {SchemaNotFoundError} from "./errors/schema-not-found.error";
-import {TooMuchSchemaError} from "./errors/too-much-schema.error";
-import {Configuration} from "./configuration";
-import * as path from "path";
-import {CallbackNotFoundError} from "./errors/callback-not-found.error";
-import {TooMuchParametersError} from "./errors/too-much-parameters.error";
-import {ParameterNotFoundError} from "./errors/parameter-not-found.error";
+} from 'ts-morph';
+import {SchemaNotFoundError} from './errors/schema-not-found.error';
+import {TooMuchSchemaError} from './errors/too-much-schema.error';
+import {Configuration} from './configuration';
+import * as path from 'path';
+import {CallbackNotFoundError} from './errors/callback-not-found.error';
+import {TooMuchParametersError} from './errors/too-much-parameters.error';
+import {ParameterNotFoundError} from './errors/parameter-not-found.error';
 
 export class SchemaParser {
 
@@ -79,9 +79,9 @@ export class SchemaParser {
             .map(method => SchemaParser.parseEventListener(method, filePath));
         schema.privateMethods = schema.cd.getMethods().filter((method: MethodDeclaration) => {
             return method.getScope() !== Scope.Public &&
-                   method.getName() !== 'register' &&
-                   method.getName() !== 'release' &&
-                   method.getDecorator('EventListener') === undefined;
+                method.getName() !== 'register' &&
+                method.getName() !== 'release' &&
+                method.getDecorator('EventListener') === undefined;
         }).map(method => <MethodDeclarationStructure>method.getStructure());
 
         return schema;
@@ -106,16 +106,16 @@ export class SchemaParser {
 
     private static isPublicMethod(method: MethodDeclaration): boolean {
         return method.getScope() === Scope.Public &&
-               method.getName() !== 'register' &&
-               method.getName() !== 'release' &&
-               method.getDecorator('EventListener') === undefined;
+            method.getName() !== 'register' &&
+            method.getName() !== 'release' &&
+            method.getDecorator('EventListener') === undefined;
     }
 
     private static isEventListener(method: MethodDeclaration): boolean {
         return method.getScope() === Scope.Public &&
-               method.getName() !== 'register' &&
-               method.getName() !== 'release' &&
-               method.getDecorator('EventListener') !== undefined;
+            method.getName() !== 'register' &&
+            method.getName() !== 'release' &&
+            method.getDecorator('EventListener') !== undefined;
     }
 
     private static isSchemaClass(cd: ClassDeclaration): boolean {

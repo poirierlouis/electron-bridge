@@ -1,4 +1,4 @@
-import {CliHelper, Parameter} from "../test/cli.helper";
+import {CliHelper, Parameter} from '../test/cli.helper';
 import {
     ClassDeclaration,
     InterfaceDeclarationStructure,
@@ -6,8 +6,8 @@ import {
     ParameterDeclaration,
     Scope,
     SourceFile
-} from "ts-morph";
-import {Schema} from "./schema";
+} from 'ts-morph';
+import {Schema} from './schema';
 
 let helper: CliHelper;
 let file: SourceFile;

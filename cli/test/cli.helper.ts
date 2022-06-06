@@ -1,10 +1,10 @@
-import {SchemaParser} from "../src/schema.parser";
-import {Configuration} from "../src/configuration";
-import {NewLineKind, Project, SourceFile} from "ts-morph";
-import * as path from "path";
-import {ApiGenerator} from "../src/api.generator";
-import {ModuleGenerator} from "../src/module.generator";
-import {BridgeGenerator} from "../src/bridge.generator";
+import {SchemaParser} from '../src/schema.parser';
+import {Configuration} from '../src/configuration';
+import {NewLineKind, Project, SourceFile} from 'ts-morph';
+import * as path from 'path';
+import {ApiGenerator} from '../src/api.generator';
+import {ModuleGenerator} from '../src/module.generator';
+import {BridgeGenerator} from '../src/bridge.generator';
 
 export interface Parameter {
 

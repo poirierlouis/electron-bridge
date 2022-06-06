@@ -1,4 +1,4 @@
-import {EventListener, Schema} from "electron-bridge-cli";
+import {EventListener, Schema} from '@lpfreelance/electron-bridge-cli';
 
 @Schema(true)
 export class ParameterNotFound {

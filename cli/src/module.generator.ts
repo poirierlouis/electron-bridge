@@ -9,15 +9,15 @@ import {
     Signature,
     SourceFile,
     StructureKind
-} from "ts-morph";
-import {Schema} from "./schema";
-import * as path from "path";
-import {Configuration} from "./configuration";
+} from 'ts-morph';
+import {Schema} from './schema';
+import * as path from 'path';
+import {Configuration} from './configuration';
 
 export class ModuleGenerator {
 
     constructor(private project: Project,
-                private config: Configuration) {
+        private config: Configuration) {
 
     }
 
@@ -52,11 +52,11 @@ export class ModuleGenerator {
             moduleSpecifier: (this.config.main) ? './bridge.module' : '@lpfreelance/electron-bridge/preload'
         });
         schema.publicInterfaces
-              .filter(is => is.isExported)
-              .forEach(is => apiImports.push(is.name));
+            .filter(is => is.isExported)
+            .forEach(is => apiImports.push(is.name));
         schema.publicClasses
-              .filter(cd => cd.isExported && cd.decorators.find(d => d.name === 'Schema') === undefined)
-              .forEach(cd => apiImports.push(cd.name));
+            .filter(cd => cd.isExported && cd.decorators.find(d => d.name === 'Schema') === undefined)
+            .forEach(cd => apiImports.push(cd.name));
         if (apiImports.length !== 0) {
             imports.push({
                 kind: StructureKind.ImportDeclaration,
@@ -107,13 +107,13 @@ export class ModuleGenerator {
     private generateEventsMethods(schema: Schema, writer: CodeBlockWriter): void {
         schema.cd.getMethods().filter(method => {
             return method.getScope() === Scope.Public &&
-                   method.getName() !== 'register' &&
-                   method.getName() !== 'release' &&
-                   method.getDecorator('EventListener') !== undefined;
+                method.getName() !== 'register' &&
+                method.getName() !== 'release' &&
+                method.getDecorator('EventListener') !== undefined;
         }).forEach((method, index, array) => {
             const decorator: Decorator = method.getDecorator('EventListener');
             const methodName: string = method.getName();
-            const channelName: string = this.getEventName(decorator, methodName);
+            const channelName: string = ModuleGenerator.getEventName(decorator, methodName);
             const parameter: ParameterDeclaration = method.getParameters()[0];
             const {withTypes, withNames}: any = ModuleGenerator.getCallbackSignatureFromParameter(parameter);
             let parameterName: string = parameter.getFullText();
@@ -150,15 +150,15 @@ export class ModuleGenerator {
         }).length > 0;
     }
 
-    private getEventName(decorator: Decorator, orElse: string): string {
+    private getPath(schema: Schema): string {
+        return path.join(this.config.output, 'preload', `${schema.fileName}.module.ts`);
+    }
+
+    private static getEventName(decorator: Decorator, orElse: string): string {
         if (decorator.getArguments().length === 0) {
             return orElse;
         }
         return decorator.getArguments()[0].getFullText().replace(/'/g, '');
-    }
-
-    private getPath(schema: Schema): string {
-        return path.join(this.config.output, 'preload', `${schema.fileName}.module.ts`);
     }
 
     private static getCallbackSignatureFromParameter(parameter: ParameterDeclaration): any {
