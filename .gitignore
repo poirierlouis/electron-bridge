@@ -5,8 +5,8 @@ src/index.js
 src
 
 demo/node_modules/
-demo/src/electron.dev.js
-demo/src/electron.preload.js
+demo/electron.dev.js
+demo/electron.preload.js
 
 cli/test/src/
 cli/coverage/
