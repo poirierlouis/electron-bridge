@@ -9,11 +9,8 @@ function createWindow() {
         width: 1024,
         height: 768,
         webPreferences: {
-            nativeWindowOpen: true,
             nodeIntegration: false,
             contextIsolation: true,
-            // @ts-ignore
-            enableRemoteModule: false,
             preload: path.join(__dirname, 'electron.preload.js')
         }
     });
