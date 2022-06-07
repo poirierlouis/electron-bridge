@@ -12,15 +12,15 @@
     "electron": "tsc electron.dev.ts && electron electron.dev.js"
   },
   "dependencies": {
-    "@lpfreelance/electron-bridge": "^1.0.1"
+    "@lpfreelance/electron-bridge": "^1.0.2"
   },
   "devDependencies": {
-    "copy-webpack-plugin": "^10.1.0",
-    "electron": "^16.0.4",
+    "copy-webpack-plugin": "^11.0.0",
+    "electron": "^19.0.3",
     "lite-server": "^2.6.1",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.6.2",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.9.1"
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.3",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2"
   }
 }
