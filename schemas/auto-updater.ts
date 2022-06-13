@@ -8,9 +8,11 @@ import {EventListener, Schema} from '@lpfreelance/electron-bridge-cli';
 export class AutoUpdater {
 
     private static events: string[] = [
+        'error',
         'checking-for-update',
         'update-available',
         'update-not-available',
+        'update-downloaded',
         'before-quit-for-update'
     ];
 
@@ -20,21 +22,17 @@ export class AutoUpdater {
 
     public register(): void {
         AutoUpdater.events.forEach(event => {
-            autoUpdater.on(<any>event, () => this.win.webContents.send(`eb.autoUpdater.${event}`));
-        });
-        autoUpdater.on('error', (error: Error) => {
-            this.win.webContents.send(`eb.autoUpdater.error`, error);
-        });
-        autoUpdater.on('update-downloaded', (event: Event, releaseNotes: string, releaseName: string,
-            releaseDate: Date, updateURL: string) => {
-            this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName,
-                releaseDate, updateURL);
+            autoUpdater.on(<any>event, (...args: any[]) => {
+                this.win.webContents.send(`eb.autoUpdater.${event}`, ...args);
+            });
         });
     }
 
     public release(): void {
         AutoUpdater.events.forEach(event => {
-            autoUpdater.off(<any>event, () => this.win.webContents.send(`eb.autoUpdater.${event}`));
+            autoUpdater.off(<any>event, (...args: any[]) => {
+                this.win.webContents.send(`eb.autoUpdater.${event}`, ...args);
+            });
         });
     }
 
