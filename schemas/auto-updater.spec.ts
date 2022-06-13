@@ -73,6 +73,7 @@ describe(AutoUpdater, () => {
             const url: string = await schema.getFeedURL();
 
             expect(url).toEqual('https://somewhere.com');
+            expect(autoUpdater.getFeedURL).toHaveBeenCalled();
         });
 
         it('should call autoUpdater.checkForUpdates', () => {
