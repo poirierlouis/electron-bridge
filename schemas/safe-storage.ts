@@ -34,7 +34,7 @@ export class SafeStorage {
      * @returns the decrypted string. Decrypts the encrypted buffer obtained with safeStorage.encryptString back into a string.
      */
     public async decryptString(encrypted: ArrayBuffer): Promise<string> {
-        return safeStorage.decryptString(new Buffer(encrypted));
+        return safeStorage.decryptString(Buffer.from(encrypted));
     }
 
 }
