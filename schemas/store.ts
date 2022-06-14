@@ -68,11 +68,11 @@ export class Store {
             isEncrypted = safeStorage.isEncryptionAvailable();
         }
         if (storePath.indexOf('\0') !== -1) {
-            throw new Error(`<electron-bridge side="main" module="store" error="Protecting against Poison Null bytes!" />`);
+            throw new Error(`Preventing Poison Null bytes attack.`);
         }
-        storePath = path.resolve(this.rootPath, `${storePath.trim().toLowerCase()}.json`);
+        storePath = path.resolve(this.rootPath, `${storePath.trim()}.json`);
         if (storePath.indexOf(this.rootPath) !== 0) {
-            throw new Error(`<electron-bridge side="main" module="store" error="Preventing directory traversal!" />`);
+            throw new Error(`Preventing directory traversal.`);
         }
         this.path = storePath;
         this.isEncrypted = isEncrypted;
@@ -153,7 +153,14 @@ export class Store {
      * @returns a store item containing found key and store reference, undefined if key is not found.
      */
     private traverse(key: any, canWrite: boolean = false): StoreItem | undefined {
+        if (key.length === 0) {
+            throw new SyntaxError(`Key must not be empty.`);
+        }
         const keys: string[] = key.split('.');
+
+        if (keys.find(item => item.length === 0) !== undefined) {
+            throw new SyntaxError(`Chained dot notation must not contain empty key(s).`);
+        }
         let store: any = this.store;
         let i: number;
 
@@ -163,7 +170,7 @@ export class Store {
             }
             store = store[keys[i]];
         }
-        if (i !== keys.length - 1) {
+        if (i !== keys.length - 1 || (!canWrite && !(keys[i] in store))) {
             return undefined;
         }
         return {
