@@ -11,4 +11,6 @@ demo/electron.preload.js
 cli/test/src/
 cli/coverage/
 
+schemas/coverage/
+
 *.tgz
