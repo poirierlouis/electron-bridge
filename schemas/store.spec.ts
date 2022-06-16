@@ -10,8 +10,12 @@ jest.mock('fs/promises');
 jest.mock('electron', () => ({
     safeStorage: {
         isEncryptionAvailable: jest.fn(),
-        encryptString: jest.fn(),
-        decryptString: jest.fn()
+        encryptString: jest.fn().mockImplementation(data => {
+            return btoa(data);
+        }),
+        decryptString: jest.fn().mockImplementation(data => {
+            return atob(data);
+        })
     }
 }));
 
@@ -25,9 +29,9 @@ describe(Store, () => {
 
     afterEach(() => {
         // @ts-ignore
-        fs.readFile.mockClear();
+        fs.readFile.mockReset();
         // @ts-ignore
-        fs.writeFile.mockClear();
+        fs.writeFile.mockReset();
     });
 
     describe('Lifecycle', () => {
@@ -90,21 +94,20 @@ describe(Store, () => {
         it('GIVEN encryption feature is enabled ' +
             'WHEN calling withStore(undefined, true) ' +
             'THEN load file at default path \'./store.json\' with binary encoding', async () => {
-            const buffer: ArrayBuffer = new ArrayBuffer(42);
+            const data: string = btoa(JSON.stringify({fake: ''}));
 
             // @ts-ignore
             path.resolve.mockReturnValueOnce(rootPath + 'store.json');
             // @ts-ignore
             safeStorage.isEncryptionAvailable.mockReturnValue(true);
             // @ts-ignore
-            safeStorage.decryptString.mockReturnValue(undefined);
-            // @ts-ignore
-            fs.readFile.mockReturnValue(buffer);
+            fs.readFile.mockReturnValue(data);
 
             await schema.withStore(undefined, true);
 
             expect(fs.readFile).toHaveBeenCalledWith(rootPath + 'store.json', {flag: 'r'});
-            expect(safeStorage.decryptString).toHaveBeenCalledWith(buffer);
+            expect(safeStorage.decryptString).toHaveBeenCalledWith(data);
+            await expect(schema.get('fake')).resolves.toEqual('');
         });
 
         it('GIVEN path using Poison Null bytes attack ' +
@@ -214,6 +217,22 @@ describe(Store, () => {
             await schema.set('grogu.age', 42);
 
             expect(fs.writeFile).toHaveBeenCalledWith(storePath, data, {encoding: 'utf8', flag: 'w'});
+        });
+
+        it('GIVEN default path and store is empty with encryption enabled ' +
+            'WHEN calling set(\'grogu.age\', 42) ' +
+            'THEN create traversed keys with value and update file with encrypted data', async () => {
+            const plainData: string = JSON.stringify({grogu: {age: 42}});
+            const data: string = btoa(plainData);
+
+            // @ts-ignore
+            safeStorage.isEncryptionAvailable.mockReturnValue(true);
+            await schema.withStore(undefined, true);
+
+            await schema.set('grogu.age', 42);
+
+            expect(safeStorage.encryptString).toHaveBeenCalledWith(plainData);
+            expect(fs.writeFile).toHaveBeenCalledWith(storePath, data, {flag: 'w'});
         });
 
         it('GIVEN default path and store has key \'simple-key\' ' +
@@ -454,6 +473,29 @@ describe(Store, () => {
             expect(fs.writeFile).toHaveBeenCalledWith(storePath, data, {encoding: 'utf8', flag: 'w'});
         });
 
+        it('GIVEN default path and store has key \'grogu: {age: 42, message: \'May the force be with you\'}\' ' +
+            'with encryption enabled ' +
+            'WHEN calling delete(\'grogu.age\') ' +
+            'THEN remove key and update file with encrypted data', async () => {
+            // @ts-ignore
+            safeStorage.isEncryptionAvailable.mockReturnValue(true);
+            await schema.withStore(undefined, true);
+            // @ts-ignore
+            fs.readFile.mockReset();
+            await schema.set('grogu', {age: 42, message: 'May the force be with you'});
+            // @ts-ignore
+            fs.writeFile.mockReset();
+
+            const plainData: string = JSON.stringify({grogu: {message: 'May the force be with you'}});
+            const data: string = btoa(plainData);
+
+            await schema.delete('grogu.age');
+
+            expect(safeStorage.encryptString).toHaveBeenCalledWith(plainData);
+            expect(fs.writeFile).toHaveBeenCalledWith(storePath, data, {flag: 'w'});
+            expect(fs.readFile).not.toHaveBeenCalled();
+        });
+
         it('GIVEN default path and store has key \'grogu: {message: \'May the force be with you\'}\' ' +
             'WHEN calling delete(\'grogu.message\') ' +
             'THEN remove key and update file', async () => {
@@ -482,6 +524,4 @@ describe(Store, () => {
             expect(fs.writeFile).toHaveBeenCalledWith(storePath, data, {encoding: 'utf8', flag: 'w'});
         });
     });
-
-    // TODO: test encrypt / decrypt usage when using store with encryption enabled.
 });
