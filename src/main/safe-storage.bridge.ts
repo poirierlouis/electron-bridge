@@ -1,5 +1,5 @@
-import {ipcMain, IpcMainInvokeEvent, safeStorage} from 'electron';
-import {Bridge} from './bridge';
+import {ipcMain, IpcMainInvokeEvent, safeStorage} from "electron";
+import {Bridge} from "./bridge";
 
 export class SafeStorageBridge implements Bridge {
     public register(): void {
@@ -10,7 +10,7 @@ export class SafeStorageBridge implements Bridge {
             return safeStorage.encryptString(plainText);
         });
         ipcMain.handle('eb.safeStorage.decryptString', async (_: IpcMainInvokeEvent, encrypted: ArrayBuffer) => {
-            return safeStorage.decryptString(new Buffer(encrypted));
+            return safeStorage.decryptString(Buffer.from(encrypted));
         });
     }
 

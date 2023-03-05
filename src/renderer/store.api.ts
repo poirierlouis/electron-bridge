@@ -7,7 +7,7 @@
  * ```javascript
  * async () => {
  *     await store.set('people', {});
- *     await store.set('people.42', {id: 42, name: Grogu, age: NaN, force: Infinite});
+ *     await store.set('people.42', {id: 42, name: 'Grogu', age: NaN, force: Infinity});
  *     await store.set('people.42.age', 50);
  *
  *     const someone = await store.has('people.42');
