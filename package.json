@@ -27,7 +27,10 @@
     "dist"
   ],
   "scripts": {
+    "postinstall": "npm run test",
+    "pretest": "npm run clean",
     "test": "jest --config jest.config.js",
+    "coverage": "jest --config jest.config.js --coverage=true",
     "clean": "shx rm -rf dist/",
     "generate": "eb generate bridge.config.json",
     "build": "npm run clean && webpack --config webpack.dev.js",
