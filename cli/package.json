@@ -1,6 +1,6 @@
 {
   "name": "@lpfreelance/electron-bridge-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tool used to quickly generate bridges for Electron application using schemas.",
   "author": "Louis Poirier",
   "license": "MIT",
