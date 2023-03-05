@@ -26,10 +26,11 @@ export class AutoUpdater {
                 this.win.webContents.send(`eb.autoUpdater.${event}`);
             });
         });
-        autoUpdater.on('error', (error) => {
+        autoUpdater.on('error', (error: Error) => {
             this.win.webContents.send(`eb.autoUpdater.error`, error);
         });
-        autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
+        autoUpdater.on('update-downloaded', (event: Event, releaseNotes: string, releaseName: string,
+            releaseDate: Date, updateURL: string) => {
             this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName, releaseDate, updateURL);
         });
     }
@@ -40,10 +41,11 @@ export class AutoUpdater {
                 this.win.webContents.send(`eb.autoUpdater.${event}`);
             });
         });
-        autoUpdater.off('error', (error) => {
+        autoUpdater.off('error', (error: Error) => {
             this.win.webContents.send(`eb.autoUpdater.error`, error);
         });
-        autoUpdater.off('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
+        autoUpdater.off('update-downloaded', (event: Event, releaseNotes: string, releaseName: string,
+            releaseDate: Date, updateURL: string) => {
             this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName, releaseDate, updateURL);
         });
     }
