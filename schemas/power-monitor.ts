@@ -13,7 +13,7 @@ export class PowerMonitor {
         'on-ac',
         'on-battery',
         'lock-screen',
-        'shutdown',
+        //'shutdown',
         'unlock-screen',
         'user-did-become-active',
         'user-did-resign-active'
@@ -25,13 +25,19 @@ export class PowerMonitor {
 
     public register(): void {
         PowerMonitor.events.forEach(event => {
-            powerMonitor.on(<any>event, (...args: any[]) => this.win.webContents.send(`eb.powerMonitor.${event}`, ...args));
+            powerMonitor.on(<any>event, () => this.win.webContents.send(`eb.powerMonitor.${event}`));
+        });
+        powerMonitor.on('shutdown', (event: Event) => {
+            this.win.webContents.send(`eb.powerMonitor.shutdown`, event);
         });
     }
 
     public release(): void {
         PowerMonitor.events.forEach(event => {
-            powerMonitor.off(<any>event, (...args: any[]) => this.win.webContents.send(`eb.powerMonitor.${event}`, ...args));
+            powerMonitor.off(<any>event, () => this.win.webContents.send(`eb.powerMonitor.${event}`));
+        });
+        powerMonitor.off('shutdown', (event: Event) => {
+            this.win.webContents.send(`eb.powerMonitor.shutdown`, event);
         });
     }
 

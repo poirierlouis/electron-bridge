@@ -8,11 +8,11 @@ import {EventListener, Schema} from '@lpfreelance/electron-bridge-cli';
 export class AutoUpdater {
 
     private static events: string[] = [
-        'error',
+        //'error',
         'checking-for-update',
         'update-available',
         'update-not-available',
-        'update-downloaded',
+        //'update-downloaded',
         'before-quit-for-update'
     ];
 
@@ -22,17 +22,29 @@ export class AutoUpdater {
 
     public register(): void {
         AutoUpdater.events.forEach(event => {
-            autoUpdater.on(<any>event, (...args: any[]) => {
-                this.win.webContents.send(`eb.autoUpdater.${event}`, ...args);
+            autoUpdater.on(<any>event, () => {
+                this.win.webContents.send(`eb.autoUpdater.${event}`);
             });
+        });
+        autoUpdater.on('error', (error) => {
+            this.win.webContents.send(`eb.autoUpdater.error`, error);
+        });
+        autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
+            this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName, releaseDate, updateURL);
         });
     }
 
     public release(): void {
         AutoUpdater.events.forEach(event => {
-            autoUpdater.off(<any>event, (...args: any[]) => {
-                this.win.webContents.send(`eb.autoUpdater.${event}`, ...args);
+            autoUpdater.off(<any>event, () => {
+                this.win.webContents.send(`eb.autoUpdater.${event}`);
             });
+        });
+        autoUpdater.off('error', (error) => {
+            this.win.webContents.send(`eb.autoUpdater.error`, error);
+        });
+        autoUpdater.off('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
+            this.win.webContents.send(`eb.autoUpdater.update-downloaded`, event, releaseNotes, releaseName, releaseDate, updateURL);
         });
     }
 
