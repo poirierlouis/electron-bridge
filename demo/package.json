@@ -12,7 +12,7 @@
     "electron": "tsc electron.dev.ts && electron electron.dev.js"
   },
   "dependencies": {
-    "@lpfreelance/electron-bridge": "^1.0.2"
+    "@lpfreelance/electron-bridge": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.6",
