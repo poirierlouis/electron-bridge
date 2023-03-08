@@ -1,8 +1,8 @@
 .idea/
 node_modules/
 dist/
-src/index.js
-src
+./src/index.js
+./src/
 
 demo/node_modules/
 demo/electron.dev.js
