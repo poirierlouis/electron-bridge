@@ -20,6 +20,7 @@ This is a monorepo containing two packages:
 ```
 electron-bridge
 ├── demo/         # a demo to quickly test common modules.
+├── demo-forge/   # a demo to show usage with `electron-forge`.
 ├── cli/          # electron-bridge-cli package to generate schemas.
 ├── schemas/      # schemas of the Electron's main process modules to generate and expose.
 └── src/          # source files generated from schemas.
@@ -205,6 +206,40 @@ You can now execute the following command to run electron:
 ```shell script
 $ tsc electron.dev.ts electron.preload.ts && electron electron.dev.js
 ```
+
+### 5. Using [electron-forge](https://www.electronforge.io/)
+
+You can use this plugin and `electron-bridge-cli` with electron-forge.
+
+After creating a project with electron-forge, you must remove the following rules in `webpack.rules.ts`:
+```typescript
+  {
+    test: /native_modules[/\\].+\.node$/,
+    use: 'node-loader',
+  },
+  {
+    test: /[/\\]node_modules[/\\].+\.(m?js|node)$/,
+    parser: { amd: false },
+    use: {
+      loader: '@vercel/webpack-asset-relocator-loader',
+      options: {
+        outputAssetBase: 'native_modules',
+      },
+    },
+  },
+```
+
+When importing external modules which are natives (Node.js only), you may need to declare them as external in 
+`webpack.main.config.ts`:
+```typescript
+  externals: {
+    "<package-name>": "commonjs2 <package-name>",
+  },
+```
+
+See more in [demo-forge/](demo-forge) which demonstrate the use of the module 
+[Clipboard](https://www.electronjs.org/docs/latest/api/clipboard) and the package 
+[fastnoisejs](https://www.npmjs.com/package/fastnoisejs) using schemas.
 
 
 
