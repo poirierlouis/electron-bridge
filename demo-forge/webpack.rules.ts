@@ -1,6 +1,13 @@
 import type { ModuleOptions } from 'webpack';
 
 export const rules: Required<ModuleOptions>['rules'] = [
+  /**
+   * # Warning
+   *
+   * The following rules are ignored when working with `electron-bridge`, `nodeIntegration: false`,
+   * `contextIsolation: true`. Allowing native modules in the renderer defeats the purpose of this plugin.
+   */
+  /*
   // Add support for native node modules
   {
     // We're specifying native_modules in the test because the asset relocator loader generates a
@@ -18,6 +25,7 @@ export const rules: Required<ModuleOptions>['rules'] = [
       },
     },
   },
+  // */
   {
     test: /\.tsx?$/,
     exclude: /(node_modules|\.webpack)/,

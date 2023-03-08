@@ -87,3 +87,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Generated code by electron-bridge-cli
+src/bridge/

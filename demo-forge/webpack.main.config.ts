@@ -12,6 +12,9 @@ export const mainConfig: Configuration = {
   module: {
     rules,
   },
+  externals: {
+    fastnoisejs: "commonjs2 fastnoisejs",
+  },
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
   },

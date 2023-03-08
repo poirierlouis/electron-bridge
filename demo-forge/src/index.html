@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+
+  </head>
+  <body>
+    <article>
+        <h1>💖 Hello World!</h1>
+        <p>Welcome to your Electron application.</p>
+    </article>
+
+    <article>
+        <div class="form-field">
+            <p id="clipboard">
+                Clipboard:
+                <span class="format"></span>
+            </p>
+
+            <button id="paste">Paste from clipboard</button>
+        </div>
+
+        <div class="form-field">
+            <input type="text" placeholder="Text to put in clipboard" />
+
+            <button id="copy">Copy into clipboard</button>
+        </div>
+
+        <button id="clear">Clear clipboard</button>
+    </article>
+
+    <article>
+        <p>Height Map</p>
+
+        <div class="form-field">
+            <label for="seed">Seed:</label>
+            <input id="seed" type="number" value="1337" />
+        </div>
+
+        <button id="generate">Generate terrain</button>
+
+        <canvas width="512" height="256"></canvas>
+    </article>
+  </body>
+</html>

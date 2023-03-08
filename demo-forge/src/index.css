@@ -1,0 +1,47 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  margin: auto;
+  max-width: 38rem;
+}
+
+article {
+  margin: 24px 0;
+  padding: 12px 0;
+  border-top: 1px solid grey;
+}
+
+article:first-child {
+  margin-top: 0;
+  border-top: none;
+}
+
+p {
+  margin: 0;
+}
+
+canvas {
+  display: flex;
+  margin: 12px auto;
+}
+
+.form-field {
+  display: flex;
+  flex-flow: column;
+  margin: 24px 0;
+}
+
+.form-field button {
+  margin-top: 12px;
+}
+
+.format {
+  padding: 0 4px;
+
+  color: white;
+  font-style: italic;
+
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: grey;
+}
